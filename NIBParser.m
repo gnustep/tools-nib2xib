@@ -181,6 +181,25 @@ void PrintMapTableOids(NSMapTable *mt)
 	return result;
 }
 
+- (NSArray *) connectionsWithObject: (id)obj
+{
+	NSEnumerator *en = [_connections objectEnumerator];
+	NSMutableArray *result = [NSMutableArray array];
+	NSIBConnector *c = nil;
+
+	while ((c = [en nextObject]))
+	{
+		if ([c destination] == obj ||
+			[c source] == obj)
+		{
+			[result addObject: c];
+		}
+	}
+
+	return result;	
+}
+
+
 - (id) parse
 {
 	NSArray *os = [NSArray arrayWithObjects: @"com.apple.InterfaceBuilder3.Cocoa.XIB", 

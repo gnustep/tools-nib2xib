@@ -10,5 +10,6 @@
 
 - (NSArray *) connectionsWithSource: (id)src;
 - (NSArray *) connectionsWithDestination: (id)dst;
+- (NSArray *) connectionsWithObject: (id)obj;
 
 @end
