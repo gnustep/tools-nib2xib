@@ -22,7 +22,7 @@ HFILES = NIBParser.h NSClassSwapper.h NSIBObjectData.h XMLDocument.h\
          XMLElement.h XMLNode.h NSWindowTemplate.h NSCustomObject.h\
          NSMenuTemplate.h, NSString+Additions.h, NSView+Additions.h\
          OidProvider.h XMLParsing.h NSObject+KeyExtraction.h\
-         NSMenuItem+Additions.h
+         NSMenuItem+Additions.h NSIBConnector.h
 
 MFILES = nib2xib_main.m
 

@@ -46,14 +46,19 @@
     NSString *tagName = [className classNameToTagName];
     XMLNode *itemNode = [[XMLNode alloc] initWithName: tagName];
     id submenu = [self target];
+    NSArray *srcs = [parser connectionsWithSource: self];
+    NSArray *dsts = [parser connectionsWithDestination: self];
 
+    NSLog(@"srcs = %@", srcs);
+    NSLog(@"dsts = %@", dsts);
+    
     // NSLog(@"keys = %@", [self keysForObject]);
     [itemNode addAttribute: @"title" value: [self title]];
     if ([[self keyEquivalent] isEqualToString: @""] == NO)
     {
         [itemNode addAttribute: @"keyEquivalent" value: [self keyEquivalent]];
     }
-    
+
     if (submenu != nil)
     {
         XMLNode *submenuNode = [submenu toXMLWithParser: parser];
@@ -63,6 +68,8 @@
         // NSLog(@"target = %@", [self target]);
         [itemNode addElement: submenuNode];
     }
+
+
 
     return itemNode;
 }

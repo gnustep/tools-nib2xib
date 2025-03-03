@@ -24,6 +24,7 @@
 #import <Foundation/Foundation.h>
 #import "OidProvider.h"
 
+@class NSArray;
 @class NSDictionary;
 @class NSMutableDictionary;
 @class NSMutableArray;

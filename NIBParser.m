@@ -29,6 +29,7 @@
 #import "NSCustomObject.h"
 #import "NSWindowTemplate.h"
 #import "NSMenuTemplate.h"
+#import "NSIBConnector.h"
 
 #import "NIBParser.h"
 #import "XMLDocument.h"
@@ -102,7 +103,7 @@ void PrintMapTableOids(NSMapTable *mt)
 		NSLog(@"objectsNib = %@", objectsNib);
 		NSLog(@"dataClasses = %@", dataClasses);
 		NSLog(@"connections = %@", _connections);
-#endif
+#endif		
 
 		_objectsDictionary = [NSMutableDictionary dictionary];
 		_classesDictionary = [NSMutableDictionary dictionaryWithContentsOfClassesFile: dataClasses];
@@ -138,7 +139,7 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (NSString *) oidString
 {
-	static int n = 999999;
+	static int n = 0xffff;
 	NSString *result = [NSString stringWithFormat: @"%08x", n--];
 	NSString *first = [result substringWithRange: NSMakeRange(0, 3)];
 	NSString *middle = [result substringWithRange: NSMakeRange(3, 2)];
@@ -146,10 +147,46 @@ void PrintMapTableOids(NSMapTable *mt)
 	return [NSString stringWithFormat: @"%@-%@-%@", first, middle, last];
 }
 
+- (NSArray *) connectionsWithSource: (id)src
+{
+	NSEnumerator *en = [_connections objectEnumerator];
+	NSMutableArray *result = [NSMutableArray array];
+	NSIBConnector *c = nil;
+
+	while ((c = [en nextObject]))
+	{
+		if ([c source] == src)
+		{
+			[result addObject: c];
+		}
+	}
+
+	return result;
+}
+
+- (NSArray *) connectionsWithDestination: (id)dst
+{
+	NSEnumerator *en = [_connections objectEnumerator];
+	NSMutableArray *result = [NSMutableArray array];
+	NSIBConnector *c = nil;
+
+	while ((c = [en nextObject]))
+	{
+		if ([c destination] == dst)
+		{
+			[result addObject: c];
+		}
+	}
+
+	return result;
+}
+
 - (id) parse
 {
-	NSArray *os = [NSArray arrayWithObjects: @"com.apple.InterfaceBuilder3.Cocoa.XIB", @"3.0", @"32700.99.1234", @"MacOSX.Cocoa", @"none", @"YES", @"direct", nil];
-	NSArray *ks = [NSArray arrayWithObjects: @"type", @"version", @"toolsVersion", @"targetRuntime", @"propertyAccessControl", @"useAutolayout", @"customObjectInstantiationMethod", nil];
+	NSArray *os = [NSArray arrayWithObjects: @"com.apple.InterfaceBuilder3.Cocoa.XIB", 
+		@"3.0", @"32700.99.1234", @"MacOSX.Cocoa", @"none", @"YES", @"direct", nil];
+	NSArray *ks = [NSArray arrayWithObjects: @"type", @"version", @"toolsVersion", 
+		@"targetRuntime", @"propertyAccessControl", @"useAutolayout", @"customObjectInstantiationMethod", nil];
 	NSMutableDictionary *docAttrs = [NSMutableDictionary dictionaryWithObjects: os forKeys: ks];
 	XMLDocument *document = [[XMLDocument alloc] initWithName: @"document"]; // value: nil attributes: docAttrs elements: nil];
 	NSMapTable *nameTable = [_object nameTable];
@@ -191,6 +228,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	while ((o = [en nextObject]) != nil)
 	{
 		NSString *label = NSMapGet(nameTable, o);
+	
 		if ([o isKindOfClass: [NSWindowTemplate class]])
 		{
 			XMLNode *window = [o toXMLWithParser: self];
@@ -212,11 +250,15 @@ void PrintMapTableOids(NSMapTable *mt)
 			[menu addAttribute: @"systemMenu" value: @"main"];
 			[objects addElement: menu];
 			// NSLog(@"menuNode = %@", menuNode);
+
+			NSLog(@"conns = %@", [self connectionsWithSource: o]);
 		}
 		else
 		{
 			NSLog(@"Unknown class: %@", o);
 		}
+
+
 	}
 
 	return document;
