@@ -24,21 +24,6 @@
 
 @implementation NSIBControlConnector (toXML)
 
-- (id) source
-{
-	return source;
-}
-
-- (id) destination
-{
-	return destination;
-}
-
-- (NSString *) label
-{
-	return label;
-}
-
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)p
 {
 	XMLNode *node = [[XMLNode alloc] initWithName: @"action"];
@@ -55,21 +40,21 @@
 
 @end
 
-/*
 @implementation NSIBConnector (toXML)
 
-- (XMLNode *) toXMLWithParser: (id<OidProvider>)p
+- (id) source
 {
-	XMLNode *node = [[XMLNode alloc] initWithName: @"action"];
-	NSArray *meth = [NSObject recursiveGetAllMethodsForClass: self];
+	return source;
+}
 
-	// [node addAttribute: @"selector" value: [self label]];
-	[node addAttribute: @"target" value: [self source]];
-	[node addAttribute: @"id" value: [p oidString]];
-	NSLog(@"method = %@", meth);
+- (id) destination
+{
+	return destination;
+}
 
-	return node;
+- (NSString *) label
+{
+	return label;
 }
 
 @end
-*/
