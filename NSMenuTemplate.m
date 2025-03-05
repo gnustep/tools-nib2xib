@@ -139,6 +139,20 @@
     	[itemNode addAttribute: @"id" value: ident];
 		[rootItems addElement: itemNode];    	
     }
+
+	// Do connections...    
+    {
+		XMLNode *conns = [[XMLNode alloc] initWithName: @"connections"];
+		NSArray *array = [parser connectionsWithObject: o];
+		NSEnumerator *en = [array objectEnumerator];
+		id c = nil;
+
+		while ((c = [en nextObject]))
+		{
+			XMLNode *n = [c toXMLWithParser: parser];
+			[conns addElement: n];
+		}
+	}
     
     return node;
 }

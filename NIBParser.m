@@ -268,16 +268,11 @@ void PrintMapTableOids(NSMapTable *mt)
 			[menu addAttribute: @"title" value: @"Main Menu"];
 			[menu addAttribute: @"systemMenu" value: @"main"];
 			[objects addElement: menu];
-			// NSLog(@"menuNode = %@", menuNode);
-
-			NSLog(@"conns = %@", [self connectionsWithSource: o]);
 		}
 		else
 		{
 			NSLog(@"Unknown class: %@", o);
 		}
-
-
 	}
 
 	return document;

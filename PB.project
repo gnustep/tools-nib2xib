@@ -15,7 +15,8 @@
             NSView+Additions.m, 
             NSObject+KeyExtraction.m, 
             NSMenuItem+Additions.m, 
-            NSMenu+Additions.m
+            NSMenu+Additions.m,
+            NSIBConnector.m
         ); 
         FRAMEWORKS = (AppKit.framework, Foundation.framework); 
         H_FILES = (
