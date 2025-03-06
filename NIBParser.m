@@ -199,6 +199,22 @@ void PrintMapTableOids(NSMapTable *mt)
 	return result;	
 }
 
+- (void) addConnectionsForObject: (id)obj
+						  toNode: (XMLNode *)node
+{
+	XMLNode *connections = [[XMLNode alloc] initWithName: @"connections"];
+	NSArray *conns = [self connectionsWithObject: obj];
+	NSEnumerator *en = [conns objectEnumerator];
+	id c = nil;
+
+	while ((c = [en nextObject]))
+	{
+		XMLNode *cn = [c toXMLWithParser: self];
+		[connections addElement: cn];
+	}
+
+	[node addElement: connections];
+}
 
 - (id) parse
 {
@@ -253,6 +269,8 @@ void PrintMapTableOids(NSMapTable *mt)
 			XMLNode *window = [o toXMLWithParser: self];
 
 			[objects addElement: window];
+			
+			[self addConnectionsForObject: o toNode: window];
 		}
 		else if ([o isKindOfClass: [NSCustomObject class]])
 		{
@@ -260,6 +278,8 @@ void PrintMapTableOids(NSMapTable *mt)
 
 			[co addAttribute:@"userLabel" value: label];
 			[objects addElement: co];
+			
+			[self addConnectionsForObject: o toNode: co];
 		}
 		else if ([o isKindOfClass: [NSMenuTemplate class]])
 		{
@@ -268,6 +288,8 @@ void PrintMapTableOids(NSMapTable *mt)
 			[menu addAttribute: @"title" value: @"Main Menu"];
 			[menu addAttribute: @"systemMenu" value: @"main"];
 			[objects addElement: menu];
+
+			[self addConnectionsForObject: o toNode: menu];
 		}
 		else
 		{

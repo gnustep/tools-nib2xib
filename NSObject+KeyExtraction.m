@@ -449,6 +449,7 @@
             if (node != nil)
             {
               [result addElement: node];
+              [parser addConnectionsForObject: o toNode: node];
             }
           }
         }

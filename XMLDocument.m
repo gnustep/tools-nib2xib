@@ -47,7 +47,7 @@
 
 - (NSString *) description 
 {
-	return [NSString stringWithFormat: @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n%@",
+	return [NSString stringWithFormat: @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>%@",
 		[super description]];
 }
 
