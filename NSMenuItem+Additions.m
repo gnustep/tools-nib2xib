@@ -46,11 +46,11 @@
     NSString *tagName = [className classNameToTagName];
     XMLNode *itemNode = [[XMLNode alloc] initWithName: tagName];
     id submenu = [self target];
-    NSArray *srcs = [parser connectionsWithSource: self];
-    NSArray *dsts = [parser connectionsWithDestination: self];
+    // NSArray *srcs = [parser connectionsWithSource: self];
+    // NSArray *dsts = [parser connectionsWithDestination: self];
 
-    NSLog(@"srcs = %@", srcs);
-    NSLog(@"dsts = %@", dsts);
+    // NSLog(@"srcs = %@", srcs);
+    // NSLog(@"dsts = %@", dsts);
     
     // NSLog(@"keys = %@", [self keysForObject]);
     [itemNode addAttribute: @"title" value: [self title]];
@@ -69,7 +69,8 @@
         [itemNode addElement: submenuNode];
     }
 
-
+    [parser addConnectionsForObject: self
+                             toNode: itemNode];
 
     return itemNode;
 }

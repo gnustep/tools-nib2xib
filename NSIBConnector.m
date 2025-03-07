@@ -36,7 +36,7 @@
 	XMLNode *node = [[XMLNode alloc] initWithName: @"outlet"];
 
 	[node addAttribute: @"property" value: [self label]];
-	[node addAttribute: @"target" value: [p oidForObject: [self source]]];
+	[node addAttribute: @"destination" value: [p oidForObject: [self destination]]];
 	[node addAttribute: @"id" value: [p oidString]];
 
 	return node;
@@ -51,7 +51,7 @@
 	XMLNode *node = [[XMLNode alloc] initWithName: @"action"];
 
 	[node addAttribute: @"selector" value: [self label]];
-	[node addAttribute: @"target" value: [p oidForObject: [self source]]];
+	[node addAttribute: @"target" value: [p oidForObject: [self destination]]];
 	[node addAttribute: @"id" value: [p oidString]];
 	
 	return node;

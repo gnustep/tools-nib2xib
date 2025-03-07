@@ -181,7 +181,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	return result;
 }
 
-- (NSArray *) connectionsWithObject: (id)obj
+- (NSArray *) connectionsWithObject: (id)origin
 {
 	NSEnumerator *en = [_connections objectEnumerator];
 	NSMutableArray *result = [NSMutableArray array];
@@ -189,10 +189,19 @@ void PrintMapTableOids(NSMapTable *mt)
 
 	while ((c = [en nextObject]))
 	{
-		if ([c destination] == obj ||
-			[c source] == obj)
+		if ([c isKindOfClass: [NSIBControlConnector class]])
 		{
-			[result addObject: c];
+			if ([c destination] == origin)
+			{
+				[result addObject: c];
+			}
+		}
+		else if ([c isKindOfClass: [NSIBOutletConnector class]])
+		{
+			if ([c source] == origin)
+			{
+				[result addObject: c];
+			}
 		}
 	}
 
