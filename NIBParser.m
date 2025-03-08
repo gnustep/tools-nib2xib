@@ -191,7 +191,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	{
 		if ([c isKindOfClass: [NSIBControlConnector class]])
 		{
-			if ([c destination] == origin)
+			if ([c source] == origin)
 			{
 				[result addObject: c];
 			}
