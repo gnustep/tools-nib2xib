@@ -222,7 +222,11 @@ void PrintMapTableOids(NSMapTable *mt)
 		[connections addElement: cn];
 	}
 
-	[node addElement: connections];
+	// Don't add empty connections...
+	if ([conns count] > 0)
+	{
+		[node addElement: connections];
+	}
 }
 
 - (id) parse
@@ -264,11 +268,14 @@ void PrintMapTableOids(NSMapTable *mt)
 	[document addElement: dependencies];
 	[document addElement: objects];
 
+	//
 	// Iterate over all objects in the map table...
+	//
 	// NOTE: At first this is confusing and it looks backwards...
 	//   it's important to remember that in the maptable in a nib, the
 	//   keys are the objects.   This table maps the objects back to their
 	//   symbolic names in the nib file.
+	//
 	while ((o = [en nextObject]) != nil)
 	{
 		NSString *label = NSMapGet(nameTable, o);

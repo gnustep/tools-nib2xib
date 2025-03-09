@@ -400,6 +400,7 @@
             }
 
             [result addElement: node];
+            // [parser addConnectionsForObject: o toNode: node];
           }
         }
         else
@@ -419,6 +420,7 @@
               if (xmlObject != nil)
               {
                 [arrayObject addElement: xmlObject];
+                [parser addConnectionsForObject: obj toNode: xmlObject];
               }
             }
 
@@ -442,6 +444,7 @@
               }
             }
             [result addAttribute: k value: filteredString];
+            // [parser addConnectionsForObject: o toNode: result];
           }
           else if ([o isKindOfClass: [NSString class]] == NO) // don't parse into these types...
           {
