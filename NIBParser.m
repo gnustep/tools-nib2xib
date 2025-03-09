@@ -35,7 +35,7 @@
 #import "XMLDocument.h"
 #import "XMLNode.h"
 
-// #define DEBUG
+#define DEBUG
 
 @interface NSMutableDictionary (LoadNibFormat)
 + (NSMutableDictionary *) dictionaryWithContentsOfClassesFile: (NSString *)file;

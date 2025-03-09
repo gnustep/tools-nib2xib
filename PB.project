@@ -16,7 +16,8 @@
             NSObject+KeyExtraction.m, 
             NSMenuItem+Additions.m, 
             NSMenu+Additions.m,
-            NSIBConnector.m
+            NSIBConnector.m,
+            NSMatrix+Additions.m
         ); 
         FRAMEWORKS = (AppKit.framework, Foundation.framework); 
         H_FILES = (
@@ -36,7 +37,8 @@
             NSObject+KeyExtraction.h,
             NSMenuItem+Additions.h,
             NSMenu+Additions.h,
-            NSIBConnector.h
+            NSIBConnector.h,
+            NSMatrix+Additions.h
         ); 
         INTERFACES = (NEXTSTEP_nib2xib.nib, WINDOWS_nib2xib.nib); 
         OTHER_LINKED = (nib2xib_main.m); 

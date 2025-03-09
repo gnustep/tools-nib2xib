@@ -31,7 +31,7 @@
 #import "XMLNode.h"
 #import "OidProvider.h"
 
-// #define DEBUG
+#define DEBUG
 
 @implementation NSObject (KeyExtraction)
 
