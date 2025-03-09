@@ -261,6 +261,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	XMLNode *capability = [[XMLNode alloc] initWithName: @"capability"];
 	XMLNode *objects = [[XMLNode alloc] initWithName: @"objects"];
 	XMLNode *firstResponder = [[XMLNode alloc] initWithName: @"customObject"];
+	XMLNode *applicationPlaceholder = [[XMLNode alloc] initWithName: @"customObject"];
 	id o = nil;
 
 #ifdef DEBUG
@@ -331,6 +332,12 @@ void PrintMapTableOids(NSMapTable *mt)
 	[firstResponder addAttribute: @"userLabel" value: @"First Responder"];
 	[firstResponder addAttribute: @"id" value: @"-1"];
 	[objects addElement: firstResponder];
+
+	// Add application placeholder...
+	[applicationPlaceholder addAttribute: @"customClass" value: @"NSApplication"];
+	[applicationPlaceholder addAttribute: @"userLabel" value: @"Application"];
+	[applicationPlaceholder addAttribute: @"id" value: @"-3"];
+	[objects addElement: applicationPlaceholder];
 
 	return document;
 }
