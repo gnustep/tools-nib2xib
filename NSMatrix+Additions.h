@@ -26,6 +26,6 @@
 
 @interface NSMatrix (Additions) <XMLParsing>
 
-- (NSString *)toXMLWithParser:(id<OidProvider>)parser;
+// - (NSString *)toXMLWithParser:(id<OidProvider>)parser;
 
 @end

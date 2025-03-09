@@ -24,8 +24,11 @@
 #import <AppKit/NSMatrix.h>
 #import <AppKit/NSCell.h>
 
+#import "NSCell+Additions.h"
 #import "NSMatrix+Additions.h"
 #import "NSString+Additions.h"
+#import "XMLNode.h"
+#import "OidProvider.h"
 
 @implementation NSMatrix (Additions)
 
