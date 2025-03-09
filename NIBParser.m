@@ -128,13 +128,13 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (NSString *) oidForObject: (id)obj
 {
-	int k = (int)NSMapGet(_oidTable, obj);
-	int n = (k != 0) ? k : [obj hash]; // if no oid, use the hash
-	NSString *result = [NSString stringWithFormat: @"%08x", n];
-	NSString *first = [result substringWithRange: NSMakeRange(0, 3)];
-	NSString *middle = [result substringWithRange: NSMakeRange(3, 2)];
-	NSString *last = [result substringWithRange: NSMakeRange(5, 3)];
-	return [NSString stringWithFormat: @"%@-%@-%@", first, middle, last];
+    int k = (int)NSMapGet(_oidTable, obj);
+    int n = (k != 0) ? k : [obj hash]; // if no oid, use the hash
+    NSString *result = [NSString stringWithFormat: @"%08x", n];
+    NSString *first = [result substringWithRange: NSMakeRange(0, 3)];
+    NSString *middle = [result substringWithRange: NSMakeRange(3, 2)];
+    NSString *last = [result substringWithRange: NSMakeRange(5, 3)];
+    return [NSString stringWithFormat: @"%@-%@-%@", first, middle, last];
 }
 
 - (NSString *) oidString
@@ -248,6 +248,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	XMLNode *plugIn = [[XMLNode alloc] initWithName: @"plugIn"];
 	XMLNode *capability = [[XMLNode alloc] initWithName: @"capability"];
 	XMLNode *objects = [[XMLNode alloc] initWithName: @"objects"];
+	XMLNode *firstResponder = [[XMLNode alloc] initWithName: @"customObject"];
 	id o = nil;
 
 #ifdef DEBUG
@@ -312,6 +313,12 @@ void PrintMapTableOids(NSMapTable *mt)
 			NSLog(@"Unknown class: %@", o);
 		}
 	}
+
+	// Add first responder...
+	[firstResponder addAttribute: @"customClass" value: @"FirstResponder"];
+	[firstResponder addAttribute: @"userLabel" value: @"First Responder"];
+	[firstResponder addAttribute: @"id" value: @"-1"];
+	[objects addElement: firstResponder];
 
 	return document;
 }
