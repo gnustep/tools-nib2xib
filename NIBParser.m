@@ -128,13 +128,25 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (NSString *) oidForObject: (id)obj
 {
-    int k = (int)NSMapGet(_oidTable, obj);
-    int n = (k != 0) ? k : [obj hash]; // if no oid, use the hash
-    NSString *result = [NSString stringWithFormat: @"%08x", n];
-    NSString *first = [result substringWithRange: NSMakeRange(0, 3)];
-    NSString *middle = [result substringWithRange: NSMakeRange(3, 2)];
-    NSString *last = [result substringWithRange: NSMakeRange(5, 3)];
-    return [NSString stringWithFormat: @"%@-%@-%@", first, middle, last];
+	int k = (int)NSMapGet(_oidTable, obj);
+	int n = (k != 0) ? k : [obj hash]; // if no oid, use the hash
+	NSString *value = nil;
+	NSString *result = [NSString stringWithFormat: @"%08x", n];
+	NSString *first = [result substringWithRange: NSMakeRange(0, 3)];
+	NSString *middle = [result substringWithRange: NSMakeRange(3, 2)];
+	NSString *last = [result substringWithRange: NSMakeRange(5, 3)];
+	value = [NSString stringWithFormat: @"%@-%@-%@", first, middle, last];
+	
+	if ([value isEqualToString: @"000-00-000"]) 
+	{
+		value = @"-1";
+	}
+	else if ([value isEqualToString: @"000-00-001"])
+	{
+		value = @"-2";
+	}
+
+	return value;
 }
 
 - (NSString *) oidString
