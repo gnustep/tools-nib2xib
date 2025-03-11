@@ -21,7 +21,7 @@
  * USA.
  */
 
-#import "NSString+Additions.h"
+#import "NSString_Additions.h"
 #import <Foundation/NSCharacterSet.h>
 
 @implementation NSString (Additions)

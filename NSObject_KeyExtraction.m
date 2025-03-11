@@ -26,8 +26,8 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
-#import "NSObject+KeyExtraction.h"
-#import "NSString+Additions.h"
+#import "NSObject_KeyExtraction.h"
+#import "NSString_Additions.h"
 #import "XMLNode.h"
 #import "OidProvider.h"
 

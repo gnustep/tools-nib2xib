@@ -22,19 +22,50 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "NSView+Additions.h"
-#import "NSString+Additions.h"
-#import "NIBParser.h"
-#import "NSObject+KeyExtraction.h"
+#import <AppKit/NSMenu.h>
 
-@implementation NSView (toXML)
+#import "NSMenuItem_Additions.h"
+#import "NSString_Additions.h"
+#import "NIBParser.h"
+#import "NSObject_KeyExtraction.h"
+
+#import "XMLNode.h"
+
+@implementation NSMenuItem (toXML)
 
 - (NSSet *) keysForObject
 {
     NSSet *keys = [super keysForObject];
     NSMutableSet *set = [NSMutableSet setWithSet: keys];
-    [set addObject: @"subviews"];
     return set;
+}
+
+- (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
+{
+    NSString *className = NSStringFromClass([self class]);
+    NSString *tagName = [className classNameToTagName];
+    XMLNode *itemNode = [[XMLNode alloc] initWithName: tagName];
+    id submenu = [self target];
+
+    [itemNode addAttribute: @"title" value: [self title]];
+    if ([[self keyEquivalent] isEqualToString: @""] == NO)
+    {
+        [itemNode addAttribute: @"keyEquivalent" value: [self keyEquivalent]];
+    }
+
+    if (submenu != nil)
+    {
+        XMLNode *submenuNode = [submenu toXMLWithParser: parser];
+
+        [submenuNode addAttribute: @"title" value: [self title]];
+        [submenuNode addAttribute: @"key" value: @"submenu"];
+        [itemNode addElement: submenuNode];
+    }
+
+    [parser addConnectionsForObject: self
+                             toNode: itemNode];
+
+    return itemNode;
 }
 
 @end

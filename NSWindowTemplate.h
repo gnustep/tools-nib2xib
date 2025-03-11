@@ -25,7 +25,7 @@
 #import <AppKit/AppKit.h>
 
 #import "XMLParsing.h"
-#import "NSObject+KeyExtraction.h"
+#import "NSObject_KeyExtraction.h"
 
 @class XMLNode;
 

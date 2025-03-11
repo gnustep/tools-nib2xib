@@ -27,8 +27,8 @@
 #import "NSWindowTemplate.h"
 
 #import "XMLNode.h"
-#import "NSString+Additions.h"
-#import "NSObject+KeyExtraction.h"
+#import "NSString_Additions.h"
+#import "NSObject_KeyExtraction.h"
 
 @implementation NSWindowTemplate (Methods)
 

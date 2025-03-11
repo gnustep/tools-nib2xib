@@ -22,25 +22,19 @@
  */
 
 #import <Foundation/Foundation.h>
-
-#import "NSMenuItem+Additions.h"
-#import "NSString+Additions.h"
+#import "NSView_Additions.h"
+#import "NSString_Additions.h"
 #import "NIBParser.h"
-#import "NSObject+KeyExtraction.h"
+#import "NSObject_KeyExtraction.h"
 
-@implementation NSMenu (toXML)
+@implementation NSView (toXML)
 
 - (NSSet *) keysForObject
 {
-    NSSet *keys = [self keysForObject];
+    NSSet *keys = [super keysForObject];
     NSMutableSet *set = [NSMutableSet setWithSet: keys];
     [set addObject: @"subviews"];
     return set;
-}
-
-- (NSNode *) toXMLWithParser: (id<OidProvider>)parser
-{
-    
 }
 
 @end

@@ -26,7 +26,7 @@
 #import "NSCustomObject.h"
 
 #import "XMLNode.h"
-#import "NSString+Additions.h"
+#import "NSString_Additions.h"
 
 @implementation NSCustomObject (Methods)
 

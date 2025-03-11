@@ -11,14 +11,14 @@
             NSWindowTemplate.m, 
             NSMenuTemplate.m, 
             NSCustomObject.m, 
-            NSString+Additions.m, 
-            NSView+Additions.m, 
-            NSObject+KeyExtraction.m, 
-            NSMenuItem+Additions.m, 
-            NSMenu+Additions.m,
+            NSString_Additions.m, 
+            NSView_Additions.m, 
+            NSObject_KeyExtraction.m, 
+            NSMenuItem_Additions.m, 
+            NSMenu_Additions.m,
             NSIBConnector.m,
-            NSMatrix+Additions.m,
-            NSCell+Additions.m
+            NSMatrix_Additions.m,
+            NSCell_Additions.m
         ); 
         FRAMEWORKS = (AppKit.framework, Foundation.framework); 
         H_FILES = (
@@ -31,16 +31,16 @@
             NSWindowTemplate.h,
             NSMenuTemplate.h,
             NSCustomObject.h,
-            NSString+Additions.h,
-            NSView+Additions.h,
+            NSString_Additions.h,
+            NSView_Additions.h,
             OidProvider.h,
             XMLParsing.h,
-            NSObject+KeyExtraction.h,
-            NSMenuItem+Additions.h,
-            NSMenu+Additions.h,
+            NSObject_KeyExtraction.h,
+            NSMenuItem_Additions.h,
+            NSMenu_Additions.h,
             NSIBConnector.h,
-            NSMatrix+Additions.h,
-            NSCell+Additions.h
+            NSMatrix_Additions.h,
+            NSCell_Additions.h
         ); 
         INTERFACES = (NEXTSTEP_nib2xib.nib, WINDOWS_nib2xib.nib); 
         OTHER_LINKED = (nib2xib_main.m); 

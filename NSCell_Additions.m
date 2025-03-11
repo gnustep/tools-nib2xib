@@ -21,42 +21,35 @@
 */
 
 #import <Foundation/Foundation.h>
-#import <AppKit/NSMatrix.h>
 #import <AppKit/NSCell.h>
 
-#import "NSCell+Additions.h"
-#import "NSMatrix+Additions.h"
-#import "NSString+Additions.h"
 #import "XMLNode.h"
 #import "OidProvider.h"
+#import "NSString_Additions.h"
+#import "NSCell_Additions.h"
 
-@implementation NSMatrix (Additions)
-
-// Write method for NSMatrix+Additions category
+// NSCell+Additions.m
+// Add method toXMLWithParser: to NSCell+Additions.m
 // Method name: toXMLWithParser:
 // Return type: XMLNode *
 // Arguments: id<OidProvider> parser
 // Code:
+@implementation NSCell (Additions)
+
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-    NSString *className = NSStringFromClass([self class]);
-    NSString *tagName = [className classNameToTagName];   
-    XMLNode *matrixNode = [[XMLNode alloc] initWithName: tagName];
-    NSArray *cells = [self cells];
-    NSEnumerator *en = [cells objectEnumerator];
-    NSCell *cell = nil;
+     NSString *className = NSStringFromClass([self class]);
+     NSString *tagName = [className classNameToTagName];
+     XMLNode *cellNode = [[XMLNode alloc] initWithName: tagName];
 
-    while ((cell = [en nextObject]))
-    {
-        XMLNode *cellNode = [cell toXMLWithParser: parser];
-        [matrixNode addElement: cellNode];
-    }
+     // [cellNode addAttribute: @"title" value: [self title]];
+     // [cellNode addAttribute: @"type" value: [self type]];
+     [cellNode addAttribute: @"id" value: [parser oidForObject: self]];
 
-    [parser addConnectionsForObject: self
-                             toNode: matrixNode];
-
-    return matrixNode;
+     [parser addConnectionsForObject: self
+                              toNode: cellNode]; 
+     return cellNode;
 }
-// Test in NSMatrix+AdditionsTests.m
 
+// Test in NSCell+AdditionsTests.m
 @end
