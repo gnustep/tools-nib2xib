@@ -26,6 +26,7 @@
 #import <AppKit/NSTextField.h>
 
 #import "XMLNode.h"
+#import "XMLParsing.h"
 
-@interface NSView (toXML)
+@interface NSView (toXML) <XMLParsing>
 @end
