@@ -87,6 +87,16 @@
 	return interfaceStyle;
 }
 
+- (void) setPullsDown: (BOOL) flag
+{
+	pullsDown = flag; // isPullsDown = pullsDown;
+}
+
+- (BOOL) pullsDown
+{
+	return pullsDown;
+}
+
 - (NSString *) classNameForParser
 {
     return @"NSMenu";
@@ -95,7 +105,8 @@
 - (NSMutableDictionary *) attributesFromProperties: (id<OidProvider>) op
 {
 	NSString *ident = [op oidForObject: self];
-	return [NSMutableDictionary dictionaryWithObjectsAndKeys: /* @"Main Menu", @"title", @"main", @"systemMenu", */ ident, @"id", nil];
+	return [NSMutableDictionary dictionaryWithObjectsAndKeys: /* @"Main Menu", @"title", @"main", @"systemMenu", */ 
+				ident, @"id", (pullsDown)?@"YES":@"NO", @"pullsDown", nil];
 }
 
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser 

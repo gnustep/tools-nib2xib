@@ -41,6 +41,7 @@
 	BOOL      isRequestMenu;
 	BOOL      isFontMenu;
 	int       interfaceStyle;
+	BOOL      pullsDown;
 }
 @end
 
@@ -57,6 +58,8 @@
 - (BOOL) isRequestMenu;
 - (BOOL) isFontMenu;
 - (int) interfaceStyle;
+- (BOOL) pullsDown;
+- (void) setPullsDown: (BOOL)flag;
 
 // Parsing...
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser;
