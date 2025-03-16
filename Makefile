@@ -17,14 +17,14 @@ CLASSES = NIBParser.m NSIBObjectData.m XMLDocument.m XMLElement.m XMLNode.m\
           NSWindowTemplate.m NSMenuTemplate.m NSCustomObject.m\
           NSString_Additions.m NSView_Additions.m NSObject_KeyExtraction.m\
           NSMenuItem_Additions.m NSIBConnector.m NSMatrix_Additions.m\
-          NSCell_Additions.m NSBox_Additions.m
+          NSCell_Additions.m NSBox_Additions.m NSMenuPanel_Additions.m
 
 HFILES = NIBParser.h NSClassSwapper.h NSIBObjectData.h XMLDocument.h\
          XMLElement.h XMLNode.h NSWindowTemplate.h NSCustomObject.h\
          NSMenuTemplate.h, NSString_Additions.h, NSView_Additions.h\
          OidProvider.h XMLParsing.h NSObject_KeyExtraction.h\
          NSMenuItem_Additions.h NSIBConnector.h NSMatrix_Additions.h\
-         NSCell_Additions.h NSBox_Additions.h
+         NSCell_Additions.h NSBox_Additions.h NSMenuPanel_Additions.h
 
 MFILES = nib2xib_main.m
 

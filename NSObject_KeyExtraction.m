@@ -183,6 +183,16 @@
     @"isSelectable",
     @"isEditable",
     @"isBordered",
+    @"imagePosition",
+    @"imageScaling",
+    @"imageAlignment",
+    @"imageFrame",
+    @"alternateImage",
+    @"alternateImageScaling",
+    @"alternateImagePosition",
+    @"alternateImageFrame",
+    @"alternateImageAlignment",
+    @"alternateImageDimsWhenDisabled",
     nil];
   return _nonObjects;
 }
