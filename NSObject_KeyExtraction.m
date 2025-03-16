@@ -33,6 +33,8 @@
 
 #define DEBUG
 
+@class NSInlineCString;
+
 @implementation NSObject (KeyExtraction)
 
 + (void) getAllMethodsForClass: (Class)cls
@@ -193,6 +195,10 @@
     @"alternateImageFrame",
     @"alternateImageAlignment",
     @"alternateImageDimsWhenDisabled",
+    @"matchesOnMultipleResolution",
+    @"prefersColorMatch",
+    @"size",
+    @"isContinuous",
     nil];
   return _nonObjects;
 }
@@ -220,6 +226,12 @@
       SEL s = NULL;
       NSString *lowerKeyName = nil;
 
+      if ([keyName length] == 0 || [keyName characterAtIndex: 0] == '_') // || [keyName isKindOfClass: [NSInlineCString class]] == YES)
+      {
+        continue;
+      }
+
+      // remove the trailing colon if it exists
 		  keyName = [keyName stringByReplacingOccurrencesOfString: @":" withString: @""];
 		  lowerKeyName = [keyName lowercaseFirstCharacter];
       
