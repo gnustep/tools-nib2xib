@@ -440,7 +440,8 @@
               [result addElement: arrayObject];
             }
           }
-          else if ([o isKindOfClass: [NSString class]] || [o isKindOfClass: [NSAttributedString class]] == NO)
+          else if ([o isKindOfClass: [NSString class]] 
+		   && [o isKindOfClass: [NSAttributedString class]] == NO)
           {
             NSString *filteredString = [o stringByReplacingOccurrencesOfString: @"\n" withString: @""];
             NSDictionary *dict = [[NSObject keyMappings] objectForKey: className];
