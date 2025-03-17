@@ -35,7 +35,7 @@
 #import "XMLDocument.h"
 #import "XMLNode.h"
 
-#define DEBUG
+// #define DEBUG
 
 @interface NSMutableDictionary (LoadNibFormat)
 + (NSMutableDictionary *) dictionaryWithContentsOfClassesFile: (NSString *)file;
@@ -98,6 +98,8 @@ void PrintMapTableOids(NSMapTable *mt)
 		_oidTable = [_object oidTable];
 		_objectTable = [_object objectTable];
 		_connections = [_object connections];
+
+		_objectsProcessed = [[NSMutableSet alloc] init];
 		
 #ifdef DEBUG
 		NSLog(@"objectsNib = %@", objectsNib);
@@ -124,6 +126,26 @@ void PrintMapTableOids(NSMapTable *mt)
 #endif
 	}
 	return self;
+}
+
+- (void) addProcessedObject: (id)object
+{
+	if (![_objectsProcessed containsObject: object])
+	{
+		[_objectsProcessed addObject: object];
+	}
+}
+- (void) removeProcessedObject: (id)object
+{
+	if ([_objectsProcessed containsObject: object])
+	{
+		[_objectsProcessed removeObject: object];
+	}
+}
+
+- (BOOL) isObjectProcessed: (id)object
+{
+	return [_objectsProcessed containsObject: object];
 }
 
 - (NSString *) oidForObject: (id)obj

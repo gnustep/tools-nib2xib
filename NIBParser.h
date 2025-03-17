@@ -23,12 +23,8 @@
 
 #import <Foundation/Foundation.h>
 #import "OidProvider.h"
+#import "XMLNode.h"
 
-@class NSArray;
-@class NSDictionary;
-@class NSMutableDictionary;
-@class NSMutableArray;
-@class NSString;
 @class XMLDocument;
 
 @interface NIBParser : NSObject <OidProvider>
@@ -43,9 +39,12 @@
 	NSMapTable *_objectTable;
 
 	XMLDocument *_document;
+	NSMutableSet *_objectsProcessed;
 }
 
 - (id) initWithNibNamed: (NSString *)nibNamed;
 - (id) parse;
+- (void) addProcessedObject: (id)object;
+- (NSArray *) objectsProcessed;
 
 @end
