@@ -48,7 +48,7 @@
 
     // Add attributes for the view
     [viewNode addAttribute: @"id" value: [parser oidForObject: self]];
-    [viewNode addAttribute: @"frame" value: NSStringFromRect([self frame])];
+    // [viewNode addAttribute: @"frame" value: NSStringFromRect([self frame])];
     // [viewNode addAttribute: @"hidden" value: [NSString stringWithFormat: @"%d", [self isHidden]]];
     
     while (subview = [subviewEnumerator nextObject])
