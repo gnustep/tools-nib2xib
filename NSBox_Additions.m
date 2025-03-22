@@ -18,26 +18,6 @@
 
 @implementation NSBox (toXML)
 
-/*
-- (NSSet *) keysForObject
-{
-    NSSet *keys = [super keysForObject];
-    NSMutableSet *set = [NSMutableSet setWithSet: keys];
-    [set addObject: @"subviews"];
-    return set;
-}
-*/
-
-/*
-- (id) _tile: (id)obj
-{
-    // NSLog(@"_tile: %@", obj);
-    NSLog(@"self %@", self);
-    // intentionally left blank
-    return self;
-}
-*/
-
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
     NSString *className = NSStringFromClass([self class]);
