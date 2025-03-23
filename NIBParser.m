@@ -148,6 +148,11 @@ void PrintMapTableOids(NSMapTable *mt)
 	return [_objectsProcessed containsObject: object];
 }
 
+- (NSSet *) objectsProcessed 
+{
+	return _objectsProcessed;
+}
+
 - (NSString *) oidForObject: (id)obj
 {
 	int k = (int)NSMapGet(_oidTable, obj);
