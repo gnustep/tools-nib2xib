@@ -73,7 +73,7 @@ void PrintMapTableOids(NSMapTable *mt)
 	while ((k = [en nextObject]) != nil)
 	{
 		void *v = NSMapGet(mt, k);
-		NSLog(@"k = %@, v = %d", k, v);
+		NSLog(@"k = %@, v = %ld", k, (int)v);
 	}
 }
 
