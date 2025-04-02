@@ -31,7 +31,7 @@
 #import "XMLNode.h"
 #import "OidProvider.h"
 
-#define DEBUG
+// #define DEBUG
 
 @class NSInlineCString;
 
@@ -128,7 +128,7 @@
     @"objectValue", // usually the same as stringValue
     @"mnemonicLocation", // mnemonics are no longer used...
     @"state",
-    @"font",
+    // @"font",
     @"textColor",
     @"backgroundColor",
     @"keyEquivalentFont",
@@ -148,6 +148,7 @@
     @"autoresizingMask",
     @"windowStyleMask",
     @"bounds",
+    @"font",
     nil];
   return _keyObjects;
 }
