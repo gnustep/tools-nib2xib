@@ -29,13 +29,21 @@
 
 @protocol OidProvider
 
+// These methods are used to process OIDs in the NIB file.
 - (NSString *) oidForObject: (id)obj;
 - (NSString *) oidString;
 
+// These methods are used to process connections in the NIB file.
 - (NSArray *) connectionsWithSource: (id)src;
 - (NSArray *) connectionsWithDestination: (id)dst;
 - (NSArray *) connectionsWithObject: (id)obj;
 - (void) addConnectionsForObject: (id)obj
 						  toNode: (XMLNode *)node;
+
+// These methods are used to process objects in the NIB file.						  
+- (void) addProcessedObject: (id)object withNode: (XMLNode *)node;
+- (NSArray *) objectsProcessed;
+- (XMLNode *) processedObject: (id)object;
+- (BOOL) isObjectProcessed: (id)object;
 
 @end

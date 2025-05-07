@@ -128,18 +128,24 @@ void PrintMapTableOids(NSMapTable *mt)
 	return self;
 }
 
-- (void) addProcessedObject: (id)object
+- (void) addProcessedObject: (id)object withNode: node
 {
-	if (![_objectsProcessed containsObject: object])
+	if (![_objectsProcessed objectForKey: object] == nil)
 	{
-		[_objectsProcessed addObject: object];
+		[_objectsProcessed setObject: node 
+							  forKey: object];
 	}
 }
+
 - (void) removeProcessedObject: (id)object
 {
-	if ([_objectsProcessed containsObject: object])
+	if ([self isObjectProcessed: object])
 	{
-		[_objectsProcessed removeObject: object];
+		[_objectsProcessed removeObjectForKey: object];
+	}
+	else
+	{
+		NSLog(@"Warning: Attempt to remove an object that was not processed.");
 	}
 }
 
@@ -148,9 +154,14 @@ void PrintMapTableOids(NSMapTable *mt)
 	return [_objectsProcessed containsObject: object];
 }
 
-- (NSSet *) objectsProcessed 
+- (NSArray *) objectsProcessed 
 {
-	return _objectsProcessed;
+	return [_objectsProcessed allKeys];
+}
+
+- (XMLNode *) processedObject: (id)object
+{
+	return [_objectsProcessed objectForKey: object];
 }
 
 - (NSString *) oidForObject: (id)obj

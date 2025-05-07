@@ -274,6 +274,12 @@
   XMLNode *result = [[XMLNode alloc] initWithName: name];
   NSString *oid = [parser oidForObject: self];
 
+  if ([parser isObjectProcessed: self])
+  {
+    return [parser processedObject: self];
+  }
+
+  [parser addProcessedObject: self withNode: result];
   if ([[NSObject skippedClasses] containsObject: className])
   {
     return nil;
