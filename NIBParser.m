@@ -130,7 +130,7 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (void) addProcessedObject: (id)object withNode: node
 {
-	if (![_objectsProcessed objectForKey: object] == nil)
+	if ([_objectsProcessed objectForKey: object] == nil)
 	{
 		[_objectsProcessed setObject: node 
 							  forKey: object];
@@ -151,7 +151,7 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (BOOL) isObjectProcessed: (id)object
 {
-	return [_objectsProcessed containsObject: object];
+	return ([_objectsProcessed objectForKey: object] != nil);
 }
 
 - (NSArray *) objectsProcessed 

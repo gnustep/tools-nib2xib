@@ -45,7 +45,5 @@
 - (id) initWithNibNamed: (NSString *)nibNamed;
 - (id) parse;
 - (void) addProcessedObject: (id)object withNode: (XMLNode *)node;
-- (NSArray *) objectsProcessed;
-- (XMLNode *) processObject: (id)object;
 
 @end
