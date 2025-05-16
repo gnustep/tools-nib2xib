@@ -31,7 +31,7 @@
 #import "XMLNode.h"
 #import "OidProvider.h"
 
-// #define DEBUG
+#define DEBUG
 
 @class NSInlineCString;
 
@@ -133,6 +133,17 @@
     @"backgroundColor",
     @"keyEquivalentFont",
     @"alternateObjectValue",
+    @"action",
+    @"target",
+    @"keyEquivalent",
+    @"keyEquivalentModifierMask",
+    @"autoenablesItems",
+    @"selectedCell",
+    @"selectedCellTag",
+    @"selectedCellIndex",
+    @"selectedCellIndexPath",
+    @"selectedCellTagPath",
+    @"selectedItem",
     nil];
   return _skippedKeys;
 }
@@ -200,6 +211,11 @@
     @"prefersColorMatch",
     @"size",
     @"isContinuous",
+    @"knobThickness",
+    @"knobProportion",
+    @"knobStyle",
+    @"knobTrackingMode",
+    @"knobTrackingMode",
     nil];
   return _nonObjects;
 }
