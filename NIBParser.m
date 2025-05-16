@@ -99,7 +99,7 @@ void PrintMapTableOids(NSMapTable *mt)
 		_objectTable = [_object objectTable];
 		_connections = [_object connections];
 
-		_objectsProcessed = [[NSMutableSet alloc] init];
+		_objectsProcessed = NSCreateMapTable(NSNonRetainedObjectMapKeyCallBacks, NSObjectMapValueCallBacks, 0);
 		
 #ifdef DEBUG
 		NSLog(@"objectsNib = %@", objectsNib);
@@ -130,38 +130,50 @@ void PrintMapTableOids(NSMapTable *mt)
 
 - (void) addProcessedObject: (id)object withNode: node
 {
-	if ([_objectsProcessed objectForKey: object] == nil)
-	{
-		[_objectsProcessed setObject: node 
-							  forKey: object];
-	}
+	NSMapInsertIfAbsent(_objectsProcessed, object, node);
 }
 
 - (void) removeProcessedObject: (id)object
 {
-	if ([self isObjectProcessed: object])
-	{
-		[_objectsProcessed removeObjectForKey: object];
-	}
-	else
-	{
-		NSLog(@"Warning: Attempt to remove an object that was not processed.");
-	}
+	NSMapRemove(_objectsProcessed, object);
 }
 
 - (BOOL) isObjectProcessed: (id)object
 {
-	return ([_objectsProcessed objectForKey: object] != nil);
+	if (NSMapGet(_objectsProcessed, object) != NULL)
+	{
+		return YES;
+	}
+	return NO;
 }
 
 - (NSArray *) objectsProcessed 
 {
-	return [_objectsProcessed allKeys];
+	NSArray *keys = NSAllMapTableKeys(_objectsProcessed);
+	NSMutableArray *result = [NSMutableArray array];
+	NSEnumerator *en = [keys objectEnumerator];
+	id k = nil;
+
+	while ((k = [en nextObject]) != nil)
+	{
+		id v = NSMapGet(_objectsProcessed, k);
+		if (v != NULL)
+		{
+			[result addObject: v];
+		}
+	}
+
+	return result;
 }
 
 - (XMLNode *) processedObject: (id)object
 {
-	return [_objectsProcessed objectForKey: object];
+	XMLNode *node = NSMapGet(_objectsProcessed, object);
+	if (node != NULL)
+	{
+		return node;
+	}
+	return nil;
 }
 
 - (NSString *) oidForObject: (id)obj

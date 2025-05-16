@@ -39,7 +39,7 @@
 	NSMapTable *_objectTable;
 
 	XMLDocument *_document;
-	NSMutableDictionary *_objectsProcessed;
+	NSMapTable *_objectsProcessed;
 }
 
 - (id) initWithNibNamed: (NSString *)nibNamed;

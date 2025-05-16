@@ -4,4 +4,4 @@
 obj-*-opt
 nib2xib
 *.xib._*
-._.*
+._*
