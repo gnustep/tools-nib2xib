@@ -144,6 +144,16 @@
     @"selectedCellIndexPath",
     @"selectedCellTagPath",
     @"selectedItem",
+    @"titleWithMnemonic",
+    @"titleWithMnemonic:withFont:",
+    @"titleWithMnemonic:withFont:withAttributes:",
+    @"titleWithMnemonic:withFont:withAttributes:withColor:",
+    @"titleWithMnemonic:withFont:withAttributes:withColor:withSize:",
+    @"titleWithMnemonic:withFont:withAttributes:withColor:withSize:withStyle:",
+    @"titleWithMnemonic:withFont:withAttributes:withColor:withSize:withStyle:withAlignment:",
+    @"titleWithMnemonic:withFont:withAttributes:withColor:withSize:withStyle:withAlignment:withLineBreakMode:",
+    @"titleOfSelectedItem",
+    @"titleOfSelectedItemWithMnemonic",
     nil];
   return _skippedKeys;
 }
