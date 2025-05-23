@@ -60,6 +60,7 @@
 - (int) interfaceStyle;
 - (BOOL) pullsDown;
 - (void) setPullsDown: (BOOL)flag;
+- (id) selectedItem;
 
 // Parsing...
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser;

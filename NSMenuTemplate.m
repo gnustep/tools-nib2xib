@@ -102,6 +102,11 @@
     return @"NSMenu";
 }
 
+- (id) selectedItem
+{
+	return selectedItem;
+}
+
 - (NSMutableDictionary *) attributesFromProperties: (id<OidProvider>) op
 {
 	NSString *ident = [op oidForObject: self];
