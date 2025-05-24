@@ -27,6 +27,8 @@
 
 #import "NIBParser.h"
 
+#define DEBUG 1
+
 int main(int argc, const char *argv[]) 
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

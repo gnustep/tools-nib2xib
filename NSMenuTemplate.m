@@ -106,9 +106,24 @@
 {
 	return nil;
 }
+
 - (void) setSelectedItem: (id)item
 {
 	// Do nothing.
+}
+
+- (int) count
+{
+	NSMatrix *matrix = [self supermenu];
+	NSArray *array = [matrix cells];
+	return [array count];
+}
+
+- (int) indexOfItem: (id)item
+{
+	NSMatrix *matrix = [self supermenu];
+	NSArray *array = [matrix cells];
+	return [array indexOfObject: item];
 }
 
 - (NSMutableDictionary *) attributesFromProperties: (id<OidProvider>) op
