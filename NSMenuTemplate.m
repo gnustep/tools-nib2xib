@@ -104,7 +104,11 @@
 
 - (id) selectedItem
 {
-	return selectedItem;
+	return nil;
+}
+- (void) setSelectedItem: (id)item
+{
+	// Do nothing.
 }
 
 - (NSMutableDictionary *) attributesFromProperties: (id<OidProvider>) op

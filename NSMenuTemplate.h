@@ -61,6 +61,7 @@
 - (BOOL) pullsDown;
 - (void) setPullsDown: (BOOL)flag;
 - (id) selectedItem;
+- (void) setSelectedItem: (id)item;
 
 // Parsing...
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser;
