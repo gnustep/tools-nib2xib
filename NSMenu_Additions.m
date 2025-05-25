@@ -43,4 +43,15 @@
     
 }
 
+- (NSSize) contentSize
+{
+    // NSSize size = [self contentSize];
+    return NSZeroSize;
+}
+
+- (void) setContentSize: (NSSize)size
+{
+    // [self setContentSize: size];
+}
+
 @end

@@ -24,4 +24,8 @@
 #import <AppKit/NSMenu.h>
 
 @interface NSMenu (toXML)
+
+- (void) setContentSize:(NSSize)size;
+- (NSSize) contentSize;
+
 @end
