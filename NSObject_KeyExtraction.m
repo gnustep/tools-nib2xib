@@ -155,6 +155,7 @@
     @"titleOfSelectedItem",
     @"titleOfSelectedItemWithMnemonic",
     @"pullsDown",
+    @"contentSize",
     nil];
   return _skippedKeys;
 }
@@ -328,6 +329,30 @@
     @"aspectRatioDisabledForView",
     @"aspectRatioDisabledForViewController",
     @"aspectRatioDisabledForController",
+    @"contentSize",
+    @"contentOrigin",
+    @"contentFrame",
+    @"contentBounds",
+    @"contentRect",
+    @"contentRectRotation",
+    @"contentRectSize",
+    @"contentRectOrigin",
+    @"drawsBackground",
+    @"isOpaque",
+    @"isFlipped",
+    @"isMovable",
+    @"isMovableByWindowBackground",
+    @"isVisible",
+    @"isHidden",
+    @"isMiniaturizable",
+    @"isMiniaturized",
+    @"isResizable",
+    @"isZoomable",
+    @"isZoomed",
+    @"isFullScreen",
+    @"isFullScreenCapable",
+    @"isRestorable",
+    @"isRestorationEnabled",
     nil];
   return _nonObjects;
 }
