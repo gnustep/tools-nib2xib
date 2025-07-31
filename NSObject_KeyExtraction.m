@@ -156,8 +156,128 @@
     @"titleOfSelectedItemWithMnemonic",
     @"pullsDown",
     @"contentSize",
+    @"cString",
     nil];
   return _skippedKeys;
+}
+
++ (NSArray *) dynamicAttributeKeys
+{
+  // Keys that should be dynamically extracted from all objects
+  NSArray *_dynamicKeys = [NSArray arrayWithObjects:
+    @"title",
+    @"stringValue", 
+    @"objectValue",
+    @"intValue",
+    @"floatValue",
+    @"doubleValue",
+    @"alphaValue",
+    @"minValue",
+    @"maxValue",
+    @"increment",
+    @"isHidden",
+    @"isEnabled",
+    @"isOpaque",
+    @"isFlipped",
+    @"isBordered",
+    @"isBezeled",
+    @"isEditable",
+    @"isSelectable",
+    @"isScrollable",
+    @"isContinuous",
+    @"allowsEmptySelection",
+    @"allowsMultipleSelection",
+    @"autoresizesSubviews",
+    @"drawsBackground",
+    @"usesAlternatingRowBackgroundColors",
+    @"gridStyleMask",
+    @"columnAutoresizingStyle",
+    @"allowsColumnReordering",
+    @"allowsColumnResizing",
+    @"allowsColumnSelection",
+    @"isVertical",
+    @"hasHorizontalScroller",
+    @"hasVerticalScroller",
+    @"autohidesScrollers",
+    @"borderType",
+    @"scrollElasticity",
+    nil];
+  return _dynamicKeys;
+}
+
++ (AttributeType) attributeTypeForKey: (NSString *)key onObject: (id)object
+{
+  SEL selector;
+  NSMethodSignature *signature;
+  const char *returnType;
+  
+  selector = NSSelectorFromString(key);
+
+  // Determine the type of attribute based on key name and object properties
+  if ([key hasSuffix: @"Rect"] || [key isEqualToString: @"frame"] || [key isEqualToString: @"bounds"])
+  {
+    return AttributeTypeRect;
+  }
+  else if ([key hasSuffix: @"Size"])
+  {
+    return AttributeTypeSize;  
+  }
+  else if ([key hasSuffix: @"Point"] || [key hasSuffix: @"Origin"])
+  {
+    return AttributeTypePoint;
+  }
+  else if ([key hasSuffix: @"Color"] || [key isEqualToString: @"backgroundColor"] || [key isEqualToString: @"textColor"])
+  {
+    return AttributeTypeColor;
+  }
+  else if ([key isEqualToString: @"font"])
+  {
+    return AttributeTypeFont;
+  }
+  else if ([key hasSuffix: @"Mask"])
+  {
+    return AttributeTypeMask;
+  }
+  else if ([key hasPrefix: @"is"] || [key hasPrefix: @"has"] || [key hasPrefix: @"allows"] || [key hasPrefix: @"draws"] || [key hasPrefix: @"uses"])
+  {
+    return AttributeTypeBoolean;
+  }
+  else if ([key hasSuffix: @"Value"] || [key hasSuffix: @"Count"] || [key hasSuffix: @"Index"] || [key hasSuffix: @"Tag"])
+  {
+    return AttributeTypeNumber;
+  }
+  else if ([key isEqualToString: @"title"] || [key isEqualToString: @"stringValue"] || [key hasSuffix: @"String"])
+  {
+    return AttributeTypeString;
+  }
+  
+  // Try to determine from the actual object's method signature
+  if (selector && [object respondsToSelector: selector])
+  {
+    signature = [object methodSignatureForSelector: selector];
+    if (signature)
+    {
+      returnType = [signature methodReturnType];
+      if (strcmp(returnType, "@") == 0) // Object
+      {
+        return AttributeTypeObject;
+      }
+      else if (strcmp(returnType, "c") == 0 || strcmp(returnType, "B") == 0) // BOOL
+      {
+        return AttributeTypeBoolean;
+      }
+      else if (strcmp(returnType, "i") == 0 || strcmp(returnType, "l") == 0 || strcmp(returnType, "q") == 0) // Integer types
+      {
+        return AttributeTypeNumber;
+      }
+      else if (strcmp(returnType, "f") == 0 || strcmp(returnType, "d") == 0) // Float/Double
+      {
+        return AttributeTypeNumber;
+      }
+    }
+  }
+  
+  return AttributeTypeUnknown;
 }
 
 + (NSArray *) keyObjects
@@ -365,20 +485,212 @@
   return _keyMappings;
 }
 
+- (NSSet *) allAttributeKeysFromMethods
+{
+  NSMutableSet *methodKeys;
+  NSArray *methods;
+  NSEnumerator *en;
+  NSString *methodName;
+  NSString *keyName;
+  SEL getterSel;
+  
+  methodKeys = [NSMutableSet set];
+  
+  // Get all methods for this class and analyze getter patterns
+  methods = [NSObject recursiveGetAllMethodsForClass: [self class]];
+  en = [methods objectEnumerator];
+  
+  while ((methodName = [en nextObject]) != nil)
+  {
+    // Look for getter methods (no parameters, not starting with underscore)
+    if (![methodName hasSuffix: @":"] && ![methodName hasPrefix: @"_"] && 
+        ![methodName hasPrefix: @"init"] && ![methodName hasPrefix: @"dealloc"] &&
+        ![methodName hasPrefix: @"copy"] && ![methodName hasPrefix: @"mutableCopy"] &&
+        ![methodName isEqualToString: @"class"] && ![methodName isEqualToString: @"superclass"] &&
+        ![methodName isEqualToString: @"hash"] && ![methodName isEqualToString: @"description"] &&
+        ![methodName isEqualToString: @"retain"] && ![methodName isEqualToString: @"release"] &&
+        ![methodName isEqualToString: @"autorelease"] && ![methodName isEqualToString: @"retainCount"])
+    {
+      getterSel = NSSelectorFromString(methodName);
+      if ([self respondsToSelector: getterSel])
+      {
+        [methodKeys addObject: methodName];
+        
+#ifdef DEBUG
+        NSLog(@"Found getter method: %@", methodName);
+#endif
+      }
+    }
+  }
+  
+  return methodKeys;
+}
+
+- (id) extractValueForKey: (NSString *)key usingType: (AttributeType)type
+{
+  SEL selector;
+  BOOL (*boolFunc)(id, SEL);
+  BOOL boolValue;
+  NSMethodSignature *signature;
+  const char *returnType;
+  float (*floatFunc)(id, SEL);
+  float floatValue;
+  double (*doubleFunc)(id, SEL);
+  double doubleValue;
+  int (*intFunc)(id, SEL);
+  int intValue;
+  NSRect (*rectFunc)(id, SEL);
+  NSRect rect;
+  NSSize (*sizeFunc)(id, SEL);
+  NSSize size;
+  NSPoint (*pointFunc)(id, SEL);
+  NSPoint point;
+  unsigned int (*maskFunc)(id, SEL);
+  unsigned int mask;
+  
+  selector = NSSelectorFromString(key);
+  if (!selector || ![self respondsToSelector: selector])
+  {
+    return nil;
+  }
+  
+  switch (type)
+  {
+    case AttributeTypeString:
+    case AttributeTypeObject:
+      return [self performSelector: selector];
+      
+    case AttributeTypeBoolean:
+      boolFunc = (BOOL (*)(id, SEL))[self methodForSelector: selector];
+      boolValue = boolFunc(self, selector);
+      return [NSNumber numberWithBool: boolValue];
+    
+    case AttributeTypeNumber:
+      // Try different numeric types
+      signature = [self methodSignatureForSelector: selector];
+      returnType = [signature methodReturnType];
+      
+      if (strcmp(returnType, "f") == 0) // float
+      {
+        floatFunc = (float (*)(id, SEL))[self methodForSelector: selector];
+        floatValue = floatFunc(self, selector);
+        return [NSNumber numberWithFloat: floatValue];
+      }
+      else if (strcmp(returnType, "d") == 0) // double
+      {
+        doubleFunc = (double (*)(id, SEL))[self methodForSelector: selector];
+        doubleValue = doubleFunc(self, selector);
+        return [NSNumber numberWithDouble: doubleValue];
+      }
+      else // integer types
+      {
+        intFunc = (int (*)(id, SEL))[self methodForSelector: selector];
+        intValue = intFunc(self, selector);
+        return [NSNumber numberWithInt: intValue];
+      }
+    
+    case AttributeTypeRect:
+      rectFunc = (NSRect (*)(id, SEL))[self methodForSelector: selector];
+      rect = rectFunc(self, selector);
+      return [NSValue valueWithRect: rect];
+    
+    case AttributeTypeSize:
+      sizeFunc = (NSSize (*)(id, SEL))[self methodForSelector: selector];
+      size = sizeFunc(self, selector);
+      return [NSValue valueWithSize: size];
+    
+    case AttributeTypePoint:
+      pointFunc = (NSPoint (*)(id, SEL))[self methodForSelector: selector];
+      point = pointFunc(self, selector);
+      return [NSValue valueWithPoint: point];
+    
+    case AttributeTypeMask:
+      maskFunc = (unsigned int (*)(id, SEL))[self methodForSelector: selector];
+      mask = maskFunc(self, selector);
+      return [NSNumber numberWithUnsignedInt: mask];
+    
+    default:
+      return nil; // [self performSelector: selector];
+  }
+}
+
+- (BOOL) shouldProcessKey: (NSString *)key withValue: (id)value
+{
+  NSArray *meaningfulWhenNonZero;
+  
+  // Skip nil values
+  if (!value)
+  {
+    return NO;
+  }
+  
+  // Skip keys in the skip list
+  if ([[NSObject skippedKeys] containsObject: key])
+  {
+    return NO;
+  }
+  
+  // Skip empty strings
+  if ([value isKindOfClass: [NSString class]] && [(NSString *)value length] == 0)
+  {
+    return NO;
+  }
+  
+  // Skip zero numeric values for certain keys that are typically meaningful when non-zero
+  if ([value isKindOfClass: [NSNumber class]])
+  {
+    meaningfulWhenNonZero = [NSArray arrayWithObjects: @"tag", @"intValue", @"floatValue", @"doubleValue", nil];
+    if ([meaningfulWhenNonZero containsObject: key] && [(NSNumber *)value doubleValue] == 0.0)
+    {
+      return NO;
+    }
+  }
+  
+  return YES;
+}
+
 - (NSSet *) keysForObject
 {
-  NSArray *methods = [NSObject recursiveGetAllMethodsForClass: [self class]];
-  NSEnumerator *en = [methods objectEnumerator];
-  NSString *selectorName = nil;
-  NSMutableSet *result = [NSMutableArray arrayWithCapacity: [methods count]];
+  NSMutableSet *allKeys;
+  NSSet *methodKeys;
+  NSArray *dynamicKeys;
+  NSString *key;
+  SEL selector;
+  NSEnumerator *en;
+  NSArray *methods;
+  NSString *selectorName;
+  NSString *keyName;
+  SEL s;
+  NSString *lowerKeyName;
+  NSString *isKeyName;
+  
+  allKeys = [NSMutableSet set];
+  
+  // Get keys from method analysis (OPENSTEP compatible)
+  methodKeys = [self allAttributeKeysFromMethods];
+  [allKeys unionSet: methodKeys];
+  
+  // Get dynamic attribute keys that should always be checked
+  dynamicKeys = [NSObject dynamicAttributeKeys];
+  en = [dynamicKeys objectEnumerator];
+  while ((key = [en nextObject]) != nil)
+  {
+    selector = NSSelectorFromString(key);
+    if ([self respondsToSelector: selector])
+    {
+      [allKeys addObject: key];
+    }
+  }
+  
+  // Get keys from method introspection (existing approach)
+  methods = [NSObject recursiveGetAllMethodsForClass: [self class]];
+  en = [methods objectEnumerator];
   
   while ((selectorName = [en nextObject]) != nil)
   {
     if ([selectorName hasPrefix: @"set"] && [selectorName isEqualToString: @"settings"] == NO)
 		{
-	  	NSString *keyName = [selectorName substringFromIndex: 3];
-      SEL s = NULL;
-      NSString *lowerKeyName = nil;
+	  	keyName = [selectorName substringFromIndex: 3];
 
       if ([keyName length] == 0 || [keyName characterAtIndex: 0] == '_') // || [keyName isKindOfClass: [NSInlineCString class]] == YES)
       {
@@ -391,25 +703,30 @@
       
       // if the object responds, add it... this way we know it's a key.
       s = NSSelectorFromString(lowerKeyName);
-      if (s != NULL)
+      if (s != NULL && [self respondsToSelector: s])
       {
-	  	  [result addObject: lowerKeyName];
+	  	  [allKeys addObject: lowerKeyName];
       }
       else
       {
-        NSString *isKeyName = [NSString stringWithFormat: @"is%@", keyName];
+        isKeyName = [NSString stringWithFormat: @"is%@", keyName];
         s = NSSelectorFromString(isKeyName);
 
-        if(s != NULL)
+        if(s != NULL && [self respondsToSelector: s])
         {
-          [result addObject: isKeyName];
+          [allKeys addObject: isKeyName];
         }
       }
 		}
   } 
 
-  return result;
+#ifdef DEBUG
+  NSLog(@"Class %@ has %lu total attribute keys", [self class], (unsigned long)[allKeys count]);
+#endif
+
+  return allKeys;
 }
+
 
 - (NSString *) classNameForParser
 {
@@ -419,13 +736,36 @@
 
 - (XMLNode *) processObjectWithParser: (id<OidProvider>)parser
 {
-  NSSet *allKeys = [self keysForObject];
-  NSEnumerator *e = [allKeys objectEnumerator];
-  id k = nil;
-  NSString *className = [self classNameForParser];    
-  NSString *name = [className classNameToTagName];
-  XMLNode *result = [[XMLNode alloc] initWithName: name];
-  NSString *oid = [parser oidForObject: self];
+  NSSet *allKeys;
+  NSEnumerator *e;
+  id k;
+  NSString *className;
+  NSString *name;
+  XMLNode *result;
+  NSString *oid;
+  AttributeType attrType;
+  id value;
+  NSRect rect;
+  XMLNode *node;
+  NSSize size;
+  NSPoint point;
+  unsigned int mask;
+  BOOL boolValue;
+  NSString *attrName;
+  NSString *filteredString;
+  NSDictionary *dict;
+  NSString *mappedKey;
+  NSEnumerator *aen;
+  id obj;
+  XMLNode *arrayObject;
+  XMLNode *xmlObject;
+  
+  allKeys = [self keysForObject];
+  e = [allKeys objectEnumerator];
+  className = [self classNameForParser];    
+  name = [className classNameToTagName];
+  result = [[XMLNode alloc] initWithName: name];
+  oid = [parser oidForObject: self];
 
   if ([parser isObjectProcessed: self])
   {
@@ -446,198 +786,207 @@
 #endif
 
   [result addAttribute: @"id" value: oid];
+  
+  // Process each key programmatically
   while ( (k = [e nextObject]) != nil )
   { 
-    if ([[NSObject skippedKeys] containsObject: k] == NO)
+    // Determine the attribute type programmatically
+    attrType = [NSObject attributeTypeForKey: k onObject: self];
+    
+    // Extract the value using the appropriate method
+    value = [self extractValueForKey: k usingType: attrType];
+    
+    // Check if we should process this key/value combination
+    if (![self shouldProcessKey: k withValue: value])
     {
-      SEL s = NSSelectorFromString(k);
-      NSMethodSignature *signature = [NSMethodSignature methodSignatureForSelector: s];
-      IMP imp = NULL;
-
-      // If the selector is NULL, skip it...
-      if (s == NULL && signature != nil)
+      continue;
+    }
+    
+#ifdef DEBUG
+    NSLog(@"Processing key: %@ (type: %d) with value: %@", k, attrType, value);
+#endif
+    
+    // Process the value based on its type
+    if (attrType == AttributeTypeRect)
+    {
+      rect = [(NSValue *)value rectValue];
+      node = [XMLNode nodeForRect: rect type: k];
+      if (node != nil)
       {
-        NSLog(@"ERROR getting the selector/signature %@", k);
-        break;
+        [result addElement: node];
+      }
+    }
+    else if (attrType == AttributeTypeSize)
+    {
+      size = [(NSValue *)value sizeValue];
+      node = [XMLNode nodeForSize: size type: k];
+      if (node != nil)
+      {
+        [result addElement: node];
+      }
+    }
+    else if (attrType == AttributeTypePoint)
+    {
+      point = [(NSValue *)value pointValue];
+      node = [XMLNode nodeForPoint: point type: k];
+      if (node != nil)
+      {
+        [result addElement: node];
+      }
+    }
+    else if (attrType == AttributeTypeMask)
+    {
+      mask = [(NSNumber *)value unsignedIntValue];
+      node = [[XMLNode alloc] initWithName: k];
+      [node addAttribute: @"key" value: k];
+      
+      if ([k isEqualToString: @"autoresizingMask"])
+      {
+        if (mask & NSViewMaxXMargin)
+        {
+          [node addAttribute: @"flexibleMaxX" value: @"YES"];
+        }
+        if (mask & NSViewMaxYMargin)
+        {
+          [node addAttribute: @"flexibleMaxY" value: @"YES"];        
+        }
+        if (mask & NSViewMinXMargin)
+        {
+          [node addAttribute: @"flexibleMinX" value: @"YES"];           
+        }
+        if (mask & NSViewMinYMargin)
+        {
+          [node addAttribute: @"flexibleMinY" value: @"YES"]; 
+        }
+        if (mask & NSViewWidthSizable)
+        {
+          [node addAttribute: @"flexibleWidth" value: @"YES"];
+        }
+        if (mask & NSViewHeightSizable)
+        {
+          [node addAttribute: @"flexibleHeight" value: @"YES"];
+        }
       }
       else
       {
-        imp = [self methodForSelector: s];
+        [node addAttribute: @"value" value: [NSString stringWithFormat: @"%u", mask]];
       }
-
-      if ([[NSObject nonObjects] containsObject: k]) // frames, sizes, flags...
+      
+      [result addElement: node];
+    }
+    else if (attrType == AttributeTypeBoolean)
+    {
+      boolValue = [(NSNumber *)value boolValue];
+      
+      if ([k isEqualToString: @"isBezeled"])
       {
-#ifdef DEBUG
-        NSLog(@"Current NON-Object = %@", k);
-#endif        
-        if ([[NSObject keyObjects] containsObject: k])
+        if (boolValue == YES)
         {
-          XMLNode *node = nil;
-
-          // rect/frame, etc... non objects
-          if ([k hasSuffix: @"Rect"] || [k isEqualToString: @"frame"] || [k isEqualToString: @"bounds"])
+          if ([self isKindOfClass: [NSTextFieldCell class]])
           {
-            NSRect (*func)(id, SEL) = (NSRect (*)(id, SEL))imp;
-            NSRect rect = (func)(self, s);
-            node = [XMLNode nodeForRect: rect type: k];
+            [result addAttribute: @"borderStyle" value: @"bezel"];
           }
-          else if ([k hasSuffix: @"Size"])
+          else
           {
-            NSSize (*func)(id, SEL) = (NSSize (*)(id, SEL))imp;
-            NSSize size = (func)(self, s);
-            node = [XMLNode nodeForSize: size type: k];
-          }
-          else if ([k hasSuffix: @"Mask"])
-          {
-            if ([k isEqualToString: @"autoresizingMask"])
-            {
-              unsigned int mask = [(NSView *)self autoresizingMask];
-
-              node = [[XMLNode alloc] initWithName: k];
-              [node addAttribute: @"key" value: k];
-              if (mask | NSViewMaxXMargin)
-              {
-                [node addAttribute: @"flexibleMaxX" value: @"YES"];
-              }
-              else if (mask | NSViewMaxYMargin)
-              {
-                [node addAttribute: @"flexibleMaxY" value: @"YES"];        
-              }
-              else if (mask | NSViewMinXMargin)
-              {
-                [node addAttribute: @"flexibleMinY" value: @"YES"];           
-              }
-              else if (mask | NSViewMinYMargin)
-              {
-                [node addAttribute: @"flexibleMinY" value: @"YES"]; 
-              }
-            }
-          }
-
-          // If the node was set above, add it...
-          if (node != nil)
-          {
-            [result addElement: node];
-          }
-        }
-        else
-        {
-          BOOL (*func)(id, SEL) = (BOOL (*)(id, SEL))imp;
-          BOOL f = (func)(self, s);
-
-          if ([k isEqualToString: @"isBezeled"])
-          {
-            if (f == YES)
-            {
-              if ([self isKindOfClass: [NSTextFieldCell class]])
-              {
-                [result addAttribute: @"borderStyle" value: @"bezel"];
-              }
-              else
-              {
-                [result addAttribute: @"type" value: @"bevel"];
-              }
-            }
-          }
-          else if ([k isEqualToString: @"isBordered"])
-          {
-            if (f == YES)
-            {
-              [result addAttribute: @"borderStyle" value: @"border"];
-#ifdef DEBUG              
-              NSLog(@"Bordered = %@", result);
-#endif
-            }
-          }
-          else if ([k hasPrefix: @"is"])
-          {
-            NSString *name = [k stringByReplacingOccurrencesOfString: @"is" withString: @""];
-
-            name = [name lowercaseFirstCharacter];
-            if (f == YES)
-            {
-              [result addAttribute: name value: @"YES"];
-            }
+            [result addAttribute: @"type" value: @"bevel"];
           }
         }
       }
-      else // Objects...
+      else if ([k isEqualToString: @"isBordered"])
       {
-        id o = [self performSelector: s];
-        
-        if (o == nil)
+        if (boolValue == YES)
         {
-          continue;
+          [result addAttribute: @"borderStyle" value: @"border"];
+        }
+      }
+      else if ([k hasPrefix: @"is"])
+      {
+        attrName = [k stringByReplacingOccurrencesOfString: @"is" withString: @""];
+        attrName = [attrName lowercaseFirstCharacter];
+        if (boolValue == YES)
+        {
+          [result addAttribute: attrName value: @"YES"];
+        }
+      }
+      else if ([k hasPrefix: @"has"] || [k hasPrefix: @"allows"] || [k hasPrefix: @"draws"] || [k hasPrefix: @"uses"])
+      {
+        if (boolValue == YES)
+        {
+          [result addAttribute: k value: @"YES"];
+        }
+      }
+    }
+    else if (attrType == AttributeTypeString)
+    {
+      if ([value isKindOfClass: [NSString class]])
+      {
+        filteredString = [value stringByReplacingOccurrencesOfString: @"\n" withString: @""];
+        dict = [[NSObject keyMappings] objectForKey: className];
+
+        if (dict != nil)
+        {
+          mappedKey = [dict objectForKey: k];
+          if (mappedKey != nil)
+          {
+            k = mappedKey;
+          }
+        }
+        [result addAttribute: k value: filteredString];
+      }
+    }
+    else if (attrType == AttributeTypeNumber)
+    {
+      [result addAttribute: k value: [value stringValue]];
+    }
+    else if (attrType == AttributeTypeObject)
+    {
+      // Handle complex objects
+      if ([[NSObject keyObjects] containsObject: k])
+      {
+        node = [value processObjectWithParser: parser];
+
+        if(node != nil)
+        {
+          if ([value isKindOfClass: [NSCell class]])
+          {
+            [node addAttribute: @"key" value: @"cell"];
+          }
+          else
+          {
+            [node addAttribute: @"key" value: k];
+          }
+
+          [result addElement: node];
+        }
+      }
+      else if ([value isKindOfClass: [NSArray class]])
+      {
+        aen = [value objectEnumerator];
+        arrayObject = [[XMLNode alloc] initWithName: k];
+
+        while ((obj = [aen nextObject]) != nil)
+        {
+          xmlObject = [obj processObjectWithParser: parser];
+          if (xmlObject != nil)
+          {
+            [arrayObject addElement: xmlObject];
+            [parser addConnectionsForObject: obj toNode: xmlObject];
+          }
         }
 
-        if ([[NSObject keyObjects] containsObject: k])
+        if ([value count] > 0)
         {
-          XMLNode *node = [o processObjectWithParser: parser];
-
-          if(node != nil)
-          {
-            if ([o isKindOfClass: [NSCell class]])
-            {
-              [node addAttribute: @"key" value: @"cell"];
-            }
-
-            [result addElement: node];
-            // [parser addConnectionsForObject: o toNode: node];
-          }
+          [result addElement: arrayObject];
         }
-        else
+      }
+      else if ([value isKindOfClass: [NSString class]] == NO && value != nil)
+      {
+        node = [value processObjectWithParser: parser];
+        if (node != nil)
         {
-#ifdef DEBUG        
-          NSLog(@"Current object = %@", k);
-#endif
-          if ([o isKindOfClass: [NSArray class]])
-          {
-            NSEnumerator *aen = [o objectEnumerator];
-            id obj = nil;
-            XMLNode *arrayObject = [[XMLNode alloc] initWithName: k];
-
-            while ((obj = [aen nextObject]) != nil)
-            {
-              XMLNode *xmlObject = [obj processObjectWithParser: parser];
-              if (xmlObject != nil)
-              {
-                [arrayObject addElement: xmlObject];
-                [parser addConnectionsForObject: obj toNode: xmlObject];
-              }
-            }
-
-            // if count is greater than 0, then add the array, otherwise...
-            if ([o count] > 0)
-            {
-              [result addElement: arrayObject];
-            }
-          }
-          else if ([o isKindOfClass: [NSString class]] 
-		   && [o isKindOfClass: [NSAttributedString class]] == NO)
-          {
-            NSString *filteredString = [o stringByReplacingOccurrencesOfString: @"\n" withString: @""];
-            NSDictionary *dict = [[NSObject keyMappings] objectForKey: className];
-
-            if (dict != nil)
-            {
-              NSString *mappedKey = [dict objectForKey: k];
-              if (mappedKey != nil)
-              {
-                k = mappedKey;
-              }
-            }
-            [result addAttribute: k value: filteredString];
-            // [parser addConnectionsForObject: o toNode: result];
-          }
-          else if ([o isKindOfClass: [NSString class]] == NO) // don't parse into these types...
-          {
-            XMLNode *node = [o processObjectWithParser: parser];
-            if (node != nil)
-            {
-              [result addElement: node];
-              [parser addConnectionsForObject: o toNode: node];
-            }
-          }
+          [node addAttribute: @"key" value: k];
+          [result addElement: node];
+          [parser addConnectionsForObject: value toNode: node];
         }
       }
     }

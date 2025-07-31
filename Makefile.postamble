@@ -12,6 +12,38 @@
 #  defined in this file.
 #
 ###############################################################################
+
+# Test target for programmatic attribute extraction
+test-programmatic: $(OFILE_DIR)/test_programmatic_extraction.o $(OFILE_DIR)/libClasses.a
+	$(CC) -o $(OFILE_DIR)/test_programmatic_extraction $(OFILE_DIR)/test_programmatic_extraction.o $(OFILE_DIR)/libClasses.a $(FRAMEWORKS) $(OTHER_LDFLAGS)
+
+$(OFILE_DIR)/test_programmatic_extraction.o: test_programmatic_extraction.m
+	$(CC) $(ALL_CFLAGS) -c test_programmatic_extraction.m -o $(OFILE_DIR)/test_programmatic_extraction.o
+
+# Create a library from the classes for testing
+$(OFILE_DIR)/libClasses.a: $(CLASSES:.m=.o)
+	ar rcs $(OFILE_DIR)/libClasses.a $(addprefix $(OFILE_DIR)/,$(CLASSES:.m=.o))
+
+###############################################################################
+# 
+# Here are the variables exported by the common "app" makefiles that can be 
+# used in any customizations you make to the template below:
+# 
+#	PRODUCT_ROOT - Name of the directory to which resources are copied.
+#	OFILE_DIR - Directory into which .o object files are generated.###########################################################
+#  NeXT Makefile.postamble
+#  Copyright 1996, NeXT Software, Inc.
+#
+#  This Makefile is used for configuring the standard app makefiles associated
+#  with ProjectBuilder.  
+#  
+#  Use this template to set attributes for a project, sub-project, bundle, or
+#  palette.  Each node in the project's tree of sub-projects and bundles 
+#  should have it's own Makefile.preamble and Makefile.postamble.  Additional
+#  rules (e.g., after_install) that are defined by the developer should be
+#  defined in this file.
+#
+###############################################################################
 # 
 # Here are the variables exported by the common "app" makefiles that can be 
 # used in any customizations you make to the template below:

@@ -373,7 +373,21 @@ void PrintMapTableOids(NSMapTable *mt)
 		}
 		else
 		{
-			NSLog(@"Unknown class: %@", o);
+			// Use programmatic attribute extraction for unknown objects
+			XMLNode *node = [o processObjectWithParser: self];
+			if (node != nil)
+			{
+				if (label != nil)
+				{
+					[node addAttribute: @"userLabel" value: label];
+				}
+				[objects addElement: node];
+				[self addConnectionsForObject: o toNode: node];
+			}
+			else
+			{
+				NSLog(@"Unknown class: %@", o);
+			}
 		}
 	}
 

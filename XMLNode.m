@@ -56,6 +56,19 @@
 	return node;
 }
 
++ (id) nodeForPoint: (NSPoint)point type: (NSString *)type
+{
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	XMLNode *node = nil;
+
+    [result setObject: [NSString stringWithFormat: @"%g", point.x] forKey: @"x"];
+    [result setObject: [NSString stringWithFormat: @"%g", point.y] forKey: @"y"];
+    [result setObject: type forKey: @"key"];
+	
+	node = [[XMLNode alloc] initWithName: @"point" value: @"" attributes: result elements: nil];
+	return node;
+}
+
 - (id) initWithName: (NSString *)name value: (NSString *)value attributes: (NSMutableDictionary *)attributes elements: (NSMutableArray *)elements
 {
 	self = [super init];

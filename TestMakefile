@@ -1,0 +1,29 @@
+# Simple test Makefile for enhanced nib2xib
+CC = gcc
+CFLAGS = -Wall -g -I. -I/System/Library/Frameworks/Foundation.framework/Headers -I/System/Library/Frameworks/AppKit.framework/Headers
+LDFLAGS = -framework Foundation -framework AppKit -lobjc
+
+SOURCES = NSObject_KeyExtraction.m NSString_Additions.m XMLNode.m XMLDocument.m test_compile.m
+OBJECTS = $(SOURCES:.m=.o)
+TARGET = test_compile
+
+.PHONY: test clean
+
+test: $(TARGET)
+	./$(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+%.o: %.m
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJECTS) $(TARGET)
+
+# Test specific compilation of our enhanced key extraction
+test-keyextraction: NSObject_KeyExtraction.o
+	@echo "Key extraction compiles successfully"
+
+NSObject_KeyExtraction.o: NSObject_KeyExtraction.m NSObject_KeyExtraction.h
+	$(CC) $(CFLAGS) -c NSObject_KeyExtraction.m -o NSObject_KeyExtraction.o

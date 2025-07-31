@@ -27,11 +27,30 @@
 
 @class XMLNode;
 
+typedef enum {
+    AttributeTypeUnknown = 0,
+    AttributeTypeObject,
+    AttributeTypeString,
+    AttributeTypeNumber,
+    AttributeTypeBoolean,
+    AttributeTypeRect,
+    AttributeTypeSize,
+    AttributeTypePoint,
+    AttributeTypeColor,
+    AttributeTypeFont,
+    AttributeTypeMask
+} AttributeType;
+
 @interface NSObject (KeyExtraction)
 
 + (NSArray *) skippedKeys;
++ (NSArray *) dynamicAttributeKeys;
++ (AttributeType) attributeTypeForKey: (NSString *)key onObject: (id)object;
 - (XMLNode *) processObjectWithParser: (id<OidProvider>)parser;
 - (NSSet *) keysForObject;
+- (NSSet *) allAttributeKeysFromMethods;
 - (NSString *) classNameForParser;
+- (id) extractValueForKey: (NSString *)key usingType: (AttributeType)type;
+- (BOOL) shouldProcessKey: (NSString *)key withValue: (id)value;
 
 @end
