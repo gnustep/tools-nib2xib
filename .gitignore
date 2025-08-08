@@ -10,3 +10,9 @@ derived_src
 *.swp
 *.DS_Store
 *.log
+.vscode
+.idea
+*.xcuserstate
+*.xcworkspace
+*.xcuserdata
+*.xcodeproj
