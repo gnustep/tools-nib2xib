@@ -1,5 +1,5 @@
 // NSBox Additions implementation
-// 
+//
 //
 // Author:      Gregory John Casamento
 // Date:        2024
@@ -23,17 +23,15 @@
     NSString *className = NSStringFromClass([self class]);
     NSString *tagName = [className classNameToTagName];
     XMLNode *boxNode = [[XMLNode alloc] initWithName: tagName];
-    NSView *contentView = [self contentView]; 
+    NSView *contentView = [self contentView];
     XMLNode *contentViewNode = [contentView toXMLWithParser: parser];
     XMLNode *contentNodeContainer = [[XMLNode alloc] initWithName: @"contentView"];
 
     [boxNode addAttribute: @"id" value: [parser oidForObject: self]];
     [boxNode addAttribute: @"title" value: [self title]];
-    // [boxNode addAttribute: @"borderType" value: [self borderType]];
-    // [boxNode addAttribute: @"boxType" value: [self boxType]];
     [boxNode addElement: contentNodeContainer];
     [contentNodeContainer addElement: contentViewNode];
-    
+
     return boxNode;
 }
 

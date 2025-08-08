@@ -19,11 +19,10 @@ CLASSES = NIBParser.m NSIBObjectData.m XMLDocument.m XMLElement.m XMLNode.m\
           NSMenuItem_Additions.m NSIBConnector.m NSMatrix_Additions.m\
           NSCell_Additions.m NSBox_Additions.m NSMenuPanel_Additions.m
 
-HFILES = NIBParser.h NSClassSwapper.h NSIBObjectData.h XMLDocument.h\
-         XMLElement.h XMLNode.h NSWindowTemplate.h NSCustomObject.h\
-         NSMenuTemplate.h, NSString_Additions.h, NSView_Additions.h\
-         OidProvider.h XMLParsing.h NSObject_KeyExtraction.h\
-         NSMenuItem_Additions.h NSIBConnector.h NSMatrix_Additions.h\
+HFILES = NIBParser.h NSIBObjectData.h XMLDocument.h XMLElement.h XMLNode.h \
+         NSWindowTemplate.h NSCustomObject.h NSMenuTemplate.h NSString_Additions.h \
+         NSView_Additions.h OidProvider.h XMLParsing.h NSObject_KeyExtraction.h \
+         NSMenuItem_Additions.h NSIBConnector.h NSMatrix_Additions.h \
          NSCell_Additions.h NSBox_Additions.h NSMenuPanel_Additions.h
 
 MFILES = nib2xib_main.m
@@ -37,7 +36,7 @@ CODE_GEN_STYLE = DYNAMIC
 MAKEFILE = tool.make
 NEXTSTEP_INSTALLDIR = $(HOME)/Apps
 WINDOWS_INSTALLDIR = /MyApps
-LIBS = 
+LIBS =
 DEBUG_LIBS = $(LIBS)
 PROF_LIBS = $(LIBS)
 
