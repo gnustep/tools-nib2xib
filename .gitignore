@@ -3,5 +3,10 @@
 *.iconheader
 obj-*-opt
 nib2xib
-*.xib._*
+*.xib
 ._*
+derived_src
+*.dSYM
+*.swp
+*.DS_Store
+*.log
