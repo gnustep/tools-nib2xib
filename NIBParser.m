@@ -30,6 +30,7 @@
 #import "NSWindowTemplate.h"
 #import "NSMenuTemplate.h"
 #import "NSIBConnector.h"
+#import "NSArchivedClasses.h"
 #import "NSObject_KeyExtraction.h"
 
 #import "NIBParser.h"
@@ -252,16 +253,16 @@ void PrintMapTableOids(NSMapTable *mt)
 
 	while ((c = [en nextObject]))
 	{
-		if ([c isKindOfClass: [NSIBControlConnector class]])
+		if ([c respondsToSelector: @selector(source)])
 		{
 			if ([c source] == origin)
 			{
 				[result addObject: c];
 			}
 		}
-		else if ([c isKindOfClass: [NSIBOutletConnector class]])
+		else if ([c respondsToSelector: @selector(object)])
 		{
-			if ([c source] == origin)
+			if ([c performSelector: @selector(object)] == origin)
 			{
 				[result addObject: c];
 			}

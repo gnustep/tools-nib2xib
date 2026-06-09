@@ -47,8 +47,14 @@
 @interface NSIBControlConnector : NSIBConnector
 @end
 
+@interface NSIBHelpConnector : NSIBConnector
+@end
+
 @interface NSIBOutletConnector (toXML) <XMLParsing>
 @end
 
 @interface NSIBControlConnector (toXML) <XMLParsing>
+@end
+
+@interface NSIBHelpConnector (toXML) <XMLParsing>
 @end

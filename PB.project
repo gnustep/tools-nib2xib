@@ -20,7 +20,8 @@
             NSMatrix_Additions.m,
             NSCell_Additions.m,
             NSBox_Additions.m,
-            NSMenuPanel_Additions.m
+            NSMenuPanel_Additions.m,
+            NSArchivedClasses.m
         ); 
         FRAMEWORKS = (AppKit.framework, Foundation.framework); 
         H_FILES = (
@@ -44,7 +45,8 @@
             NSMatrix_Additions.h,
             NSCell_Additions.h,
             NSBox_Additions.h,
-            NSMenuPanel_Additions.h
+            NSMenuPanel_Additions.h,
+            NSArchivedClasses.h
         ); 
         INTERFACES = (NEXTSTEP_nib2xib.nib, WINDOWS_nib2xib.nib); 
         OTHER_LINKED = (nib2xib_main.m); 

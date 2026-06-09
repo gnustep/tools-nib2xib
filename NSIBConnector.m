@@ -59,6 +59,27 @@
 
 @end
 
+@implementation NSIBHelpConnector (toXML)
+
+- (XMLNode *) toXMLWithParser: (id<OidProvider>)p
+{
+	XMLNode *node = [[XMLNode alloc] initWithName: @"outlet"];
+	NSString *property = [self label];
+
+	if (property == nil)
+	{
+		property = @"toolTip";
+	}
+
+	[node addAttribute: @"property" value: property];
+	[node addAttribute: @"destination" value: [p oidForObject: [self destination]]];
+	[node addAttribute: @"id" value: [p oidString]];
+
+	return node;
+}
+
+@end
+
 @implementation NSIBConnector (toXML)
 
 - (id) source
