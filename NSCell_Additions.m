@@ -27,6 +27,8 @@
 #import "OidProvider.h"
 #import "NSString_Additions.h"
 #import "NSCell_Additions.h"
+#import "NIBParser.h"
+#import "NSObject_KeyExtraction.h"
 
 // NSCell+Additions.m
 // Add method toXMLWithParser: to NSCell+Additions.m
@@ -38,16 +40,13 @@
 
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-     NSString *className = NSStringFromClass([self class]);
-     NSString *tagName = [className classNameToTagName];
-     XMLNode *cellNode = [[XMLNode alloc] initWithName: tagName];
+     XMLNode *cellNode = [self processObjectWithParser: parser];
 
-     // [cellNode addAttribute: @"title" value: [self title]];
-     // [cellNode addAttribute: @"type" value: [self type]];
-     [cellNode addAttribute: @"id" value: [parser oidForObject: self]];
-
-     [parser addConnectionsForObject: self
-                              toNode: cellNode]; 
+     if (cellNode != nil)
+     {
+          [parser addConnectionsForObject: self
+                                   toNode: cellNode];
+     }
      return cellNode;
 }
 

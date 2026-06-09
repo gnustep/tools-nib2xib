@@ -29,6 +29,8 @@
 #import "NSString_Additions.h"
 #import "XMLNode.h"
 #import "OidProvider.h"
+#import "NIBParser.h"
+#import "NSObject_KeyExtraction.h"
 
 @implementation NSMatrix (Additions)
 
@@ -39,17 +41,31 @@
 // Code:
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-    NSString *className = NSStringFromClass([self class]);
-    NSString *tagName = [className classNameToTagName];   
-    XMLNode *matrixNode = [[XMLNode alloc] initWithName: tagName];
+    XMLNode *matrixNode = [self processObjectWithParser: parser];
+    XMLNode *cellsNode = nil;
     NSArray *cells = [self cells];
     NSEnumerator *en = [cells objectEnumerator];
     NSCell *cell = nil;
 
+    if (matrixNode == nil)
+    {
+        return nil;
+    }
+
+    cellsNode = [[XMLNode alloc] initWithName: @"cells"];
     while ((cell = [en nextObject]))
     {
         XMLNode *cellNode = [cell toXMLWithParser: parser];
-        [matrixNode addElement: cellNode];
+
+        if (cellNode != nil)
+        {
+            [cellsNode addElement: cellNode];
+        }
+    }
+
+    if ([cells count] > 0)
+    {
+        [matrixNode addElement: cellsNode];
     }
 
     [parser addConnectionsForObject: self

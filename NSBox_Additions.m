@@ -20,19 +20,7 @@
 
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-    NSString *className = NSStringFromClass([self class]);
-    NSString *tagName = [className classNameToTagName];
-    XMLNode *boxNode = [[XMLNode alloc] initWithName: tagName];
-    NSView *contentView = [self contentView];
-    XMLNode *contentViewNode = [contentView toXMLWithParser: parser];
-    XMLNode *contentNodeContainer = [[XMLNode alloc] initWithName: @"contentView"];
-
-    [boxNode addAttribute: @"id" value: [parser oidForObject: self]];
-    [boxNode addAttribute: @"title" value: [self title]];
-    [boxNode addElement: contentNodeContainer];
-    [contentNodeContainer addElement: contentViewNode];
-
-    return boxNode;
+    return [self processObjectWithParser: parser];
 }
 
 @end

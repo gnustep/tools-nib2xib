@@ -131,11 +131,11 @@
     // @"font",
     @"textColor",
     @"backgroundColor",
+    @"attributedStringValue",
     @"keyEquivalentFont",
     @"alternateObjectValue",
     @"action",
     @"target",
-    @"keyEquivalent",
     @"keyEquivalentModifierMask",
     @"autoenablesItems",
     @"selectedCell",
@@ -242,13 +242,13 @@
   {
     return AttributeTypeBoolean;
   }
-  else if ([key hasSuffix: @"Value"] || [key hasSuffix: @"Count"] || [key hasSuffix: @"Index"] || [key hasSuffix: @"Tag"])
-  {
-    return AttributeTypeNumber;
-  }
   else if ([key isEqualToString: @"title"] || [key isEqualToString: @"stringValue"] || [key hasSuffix: @"String"])
   {
     return AttributeTypeString;
+  }
+  else if ([key hasSuffix: @"Value"] || [key hasSuffix: @"Count"] || [key hasSuffix: @"Index"] || [key hasSuffix: @"Tag"])
+  {
+    return AttributeTypeNumber;
   }
   
   // Try to determine from the actual object's method signature
@@ -493,31 +493,53 @@
   NSString *methodName;
   NSString *keyName;
   SEL getterSel;
+  NSString *isKeyName;
   
   methodKeys = [NSMutableSet set];
   
-  // Get all methods for this class and analyze getter patterns
+  /*
+   * OPENSTEP has no ObjC 2.0 properties, so treat a setter/getter pair as
+   * the runtime declaration that a value is an attribute.
+   */
   methods = [NSObject recursiveGetAllMethodsForClass: [self class]];
   en = [methods objectEnumerator];
   
   while ((methodName = [en nextObject]) != nil)
   {
-    // Look for getter methods (no parameters, not starting with underscore)
-    if (![methodName hasSuffix: @":"] && ![methodName hasPrefix: @"_"] && 
-        ![methodName hasPrefix: @"init"] && ![methodName hasPrefix: @"dealloc"] &&
-        ![methodName hasPrefix: @"copy"] && ![methodName hasPrefix: @"mutableCopy"] &&
-        ![methodName isEqualToString: @"class"] && ![methodName isEqualToString: @"superclass"] &&
-        ![methodName isEqualToString: @"hash"] && ![methodName isEqualToString: @"description"] &&
-        ![methodName isEqualToString: @"retain"] && ![methodName isEqualToString: @"release"] &&
-        ![methodName isEqualToString: @"autorelease"] && ![methodName isEqualToString: @"retainCount"])
+    if ([methodName hasPrefix: @"set"] &&
+        [methodName hasSuffix: @":"] &&
+        [methodName isEqualToString: @"settings"] == NO)
     {
-      getterSel = NSSelectorFromString(methodName);
+      keyName = [methodName substringWithRange:
+        NSMakeRange(3, [methodName length] - 4)];
+
+      if ([keyName length] == 0 || [keyName characterAtIndex: 0] == '_')
+      {
+        continue;
+      }
+
+      keyName = [keyName lowercaseFirstCharacter];
+      getterSel = NSSelectorFromString(keyName);
       if ([self respondsToSelector: getterSel])
       {
-        [methodKeys addObject: methodName];
+        [methodKeys addObject: keyName];
         
 #ifdef DEBUG
-        NSLog(@"Found getter method: %@", methodName);
+        NSLog(@"Found attribute method pair: %@ / %@", methodName, keyName);
+#endif
+        continue;
+      }
+
+      keyName = [methodName substringWithRange:
+        NSMakeRange(3, [methodName length] - 4)];
+      isKeyName = [NSString stringWithFormat: @"is%@", keyName];
+      getterSel = NSSelectorFromString(isKeyName);
+      if ([self respondsToSelector: getterSel])
+      {
+        [methodKeys addObject: isKeyName];
+
+#ifdef DEBUG
+        NSLog(@"Found boolean attribute method pair: %@ / %@", methodName, isKeyName);
 #endif
       }
     }
@@ -653,73 +675,13 @@
 {
   NSMutableSet *allKeys;
   NSSet *methodKeys;
-  NSArray *dynamicKeys;
-  NSString *key;
-  SEL selector;
-  NSEnumerator *en;
-  NSArray *methods;
-  NSString *selectorName;
-  NSString *keyName;
-  SEL s;
-  NSString *lowerKeyName;
-  NSString *isKeyName;
   
   allKeys = [NSMutableSet set];
   
-  // Get keys from method analysis (OPENSTEP compatible)
+  // Get keys from ObjC 1.0 method analysis.
   methodKeys = [self allAttributeKeysFromMethods];
   [allKeys unionSet: methodKeys];
   
-  // Get dynamic attribute keys that should always be checked
-  dynamicKeys = [NSObject dynamicAttributeKeys];
-  en = [dynamicKeys objectEnumerator];
-  while ((key = [en nextObject]) != nil)
-  {
-    selector = NSSelectorFromString(key);
-    if ([self respondsToSelector: selector])
-    {
-      [allKeys addObject: key];
-    }
-  }
-  
-  // Get keys from method introspection (existing approach)
-  methods = [NSObject recursiveGetAllMethodsForClass: [self class]];
-  en = [methods objectEnumerator];
-  
-  while ((selectorName = [en nextObject]) != nil)
-  {
-    if ([selectorName hasPrefix: @"set"] && [selectorName isEqualToString: @"settings"] == NO)
-		{
-	  	keyName = [selectorName substringFromIndex: 3];
-
-      if ([keyName length] == 0 || [keyName characterAtIndex: 0] == '_') // || [keyName isKindOfClass: [NSInlineCString class]] == YES)
-      {
-        continue;
-      }
-
-      // remove the trailing colon if it exists
-		  keyName = [keyName stringByReplacingOccurrencesOfString: @":" withString: @""];
-		  lowerKeyName = [keyName lowercaseFirstCharacter];
-      
-      // if the object responds, add it... this way we know it's a key.
-      s = NSSelectorFromString(lowerKeyName);
-      if (s != NULL && [self respondsToSelector: s])
-      {
-	  	  [allKeys addObject: lowerKeyName];
-      }
-      else
-      {
-        isKeyName = [NSString stringWithFormat: @"is%@", keyName];
-        s = NSSelectorFromString(isKeyName);
-
-        if(s != NULL && [self respondsToSelector: s])
-        {
-          [allKeys addObject: isKeyName];
-        }
-      }
-		}
-  } 
-
 #ifdef DEBUG
   NSLog(@"Class %@ has %lu total attribute keys", [self class], (unsigned long)[allKeys count]);
 #endif
@@ -743,6 +705,7 @@
   NSString *name;
   XMLNode *result;
   NSString *oid;
+  BOOL usesObjectIdentity;
   AttributeType attrType;
   id value;
   NSRect rect;
@@ -759,20 +722,25 @@
   id obj;
   XMLNode *arrayObject;
   XMLNode *xmlObject;
+  id textValue;
   
   allKeys = [self keysForObject];
   e = [allKeys objectEnumerator];
   className = [self classNameForParser];    
   name = [className classNameToTagName];
   result = [[XMLNode alloc] initWithName: name];
-  oid = [parser oidForObject: self];
+  usesObjectIdentity = [self isKindOfClass: [NSImage class]] == NO;
+  oid = usesObjectIdentity ? [parser oidForObject: self] : [parser oidString];
 
-  if ([parser isObjectProcessed: self])
+  if (usesObjectIdentity && [parser isObjectProcessed: self])
   {
     return [parser processedObject: self];
   }
 
-  [parser addProcessedObject: self withNode: result];
+  if (usesObjectIdentity)
+  {
+    [parser addProcessedObject: self withNode: result];
+  }
   if ([[NSObject skippedClasses] containsObject: className])
   {
     return nil;
@@ -786,6 +754,19 @@
 #endif
 
   [result addAttribute: @"id" value: oid];
+
+  if ([self isKindOfClass: [NSTextFieldCell class]] &&
+      [self respondsToSelector: @selector(stringValue)])
+  {
+    textValue = [self performSelector: @selector(stringValue)];
+    if ([textValue isKindOfClass: [NSString class]] &&
+        [(NSString *)textValue length] > 0)
+    {
+      filteredString = [(NSString *)textValue stringByReplacingOccurrencesOfString: @"\n"
+                                                                        withString: @""];
+      [result addAttribute: @"title" value: filteredString];
+    }
+  }
   
   // Process each key programmatically
   while ( (k = [e nextObject]) != nil )

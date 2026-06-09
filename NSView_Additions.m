@@ -40,24 +40,7 @@
 
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-    NSString *className = NSStringFromClass([self class]);
-    NSString *tagName = [className classNameToTagName];
-    XMLNode *viewNode = [[XMLNode alloc] initWithName: tagName];
-    NSEnumerator *subviewEnumerator = [[self subviews] objectEnumerator];
-    NSView *subview = nil;
-
-    // Add attributes for the view
-    [viewNode addAttribute: @"id" value: [parser oidForObject: self]];
-    // [viewNode addAttribute: @"frame" value: NSStringFromRect([self frame])];
-    // [viewNode addAttribute: @"hidden" value: [NSString stringWithFormat: @"%d", [self isHidden]]];
-    
-    while (subview = [subviewEnumerator nextObject])
-    {
-        XMLNode *subviewNode = [subview toXMLWithParser: parser];
-        [viewNode addElement: subviewNode];
-    }
-    
-    return viewNode;
+    return [self processObjectWithParser: parser];
 }
 
 @end

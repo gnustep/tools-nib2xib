@@ -30,6 +30,7 @@
 #import "NSWindowTemplate.h"
 #import "NSMenuTemplate.h"
 #import "NSIBConnector.h"
+#import "NSObject_KeyExtraction.h"
 
 #import "NIBParser.h"
 #import "XMLDocument.h"
@@ -343,52 +344,42 @@ void PrintMapTableOids(NSMapTable *mt)
 	while ((o = [en nextObject]) != nil)
 	{
 		NSString *label = NSMapGet(nameTable, o);
+		XMLNode *node = nil;
+		BOOL usedDynamicFallback = NO;
 	
-		if ([o isKindOfClass: [NSWindowTemplate class]])
+		if ([o respondsToSelector: @selector(toXMLWithParser:)])
 		{
-			XMLNode *window = [o toXMLWithParser: self];
-
-			[objects addElement: window];
-			
-			[self addConnectionsForObject: o toNode: window];
-		}
-		else if ([o isKindOfClass: [NSCustomObject class]])
-		{
-			XMLNode *co = [o toXMLWithParser: self];
-
-			[co addAttribute:@"userLabel" value: label];
-			[objects addElement: co];
-			
-			[self addConnectionsForObject: o toNode: co];
-		}
-		else if ([o isKindOfClass: [NSMenuTemplate class]])
-		{
-			XMLNode *menu = [o toXMLWithParser: self];
-
-			[menu addAttribute: @"title" value: @"Main Menu"];
-			[menu addAttribute: @"systemMenu" value: @"main"];
-			[objects addElement: menu];
-
-			[self addConnectionsForObject: o toNode: menu];
+			node = [o performSelector: @selector(toXMLWithParser:)
+							withObject: self];
 		}
 		else
 		{
-			// Use programmatic attribute extraction for unknown objects
-			XMLNode *node = [o processObjectWithParser: self];
-			if (node != nil)
-			{
-				if (label != nil)
-				{
-					[node addAttribute: @"userLabel" value: label];
-				}
-				[objects addElement: node];
-				[self addConnectionsForObject: o toNode: node];
-			}
-			else
-			{
-				NSLog(@"Unknown class: %@", o);
-			}
+			node = [o processObjectWithParser: self];
+			usedDynamicFallback = YES;
 		}
+
+		if (node == nil)
+		{
+			NSLog(@"Unknown class: %@", o);
+			continue;
+		}
+
+		if ([o isKindOfClass: [NSCustomObject class]] && label != nil)
+		{
+			[node addAttribute: @"userLabel" value: label];
+		}
+		else if ([o isKindOfClass: [NSMenuTemplate class]])
+		{
+			[node addAttribute: @"title" value: @"Main Menu"];
+			[node addAttribute: @"systemMenu" value: @"main"];
+		}
+		else if (usedDynamicFallback == YES && label != nil)
+		{
+			[node addAttribute: @"userLabel" value: label];
+		}
+
+		[objects addElement: node];
+		[self addConnectionsForObject: o toNode: node];
 	}
 
 	// Add first responder...

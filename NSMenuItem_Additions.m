@@ -42,24 +42,24 @@
 
 - (XMLNode *) toXMLWithParser: (id<OidProvider>)parser
 {
-    NSString *className = NSStringFromClass([self class]);
-    NSString *tagName = [className classNameToTagName];
-    XMLNode *itemNode = [[XMLNode alloc] initWithName: tagName];
+    XMLNode *itemNode = [self processObjectWithParser: parser];
     id submenu = [self target];
 
-    [itemNode addAttribute: @"title" value: [self title]];
-    if ([[self keyEquivalent] isEqualToString: @""] == NO)
+    if (itemNode == nil)
     {
-        [itemNode addAttribute: @"keyEquivalent" value: [self keyEquivalent]];
+        return nil;
     }
 
     if (submenu != nil)
     {
         XMLNode *submenuNode = [submenu toXMLWithParser: parser];
 
-        [submenuNode addAttribute: @"title" value: [self title]];
-        [submenuNode addAttribute: @"key" value: @"submenu"];
-        [itemNode addElement: submenuNode];
+        if (submenuNode != nil)
+        {
+            [submenuNode addAttribute: @"title" value: [self title]];
+            [submenuNode addAttribute: @"key" value: @"submenu"];
+            [itemNode addElement: submenuNode];
+        }
     }
 
     [parser addConnectionsForObject: self
